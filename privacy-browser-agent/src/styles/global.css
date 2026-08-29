@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Agent-specific base styles injected into shadow DOM and sidepanel */
+@layer base {
+  :root, :host {
+    /* Light Theme (Default) - Glassmorphism */
+    --agent-primary: #6366f1;
+    --agent-primary-hover: #4f46e5;
+    --agent-surface: rgba(255, 255, 255, 0.7);
+    --agent-surface-light: rgba(255, 255, 255, 0.8);
+    --agent-bg: #f4f5f7; /* Soft light backdrop instead of transparent */
+    --agent-text: #111827;
+    --agent-text-muted: #4b5563;
+    --agent-success: #10b981;
+    --agent-error: #ef4444;
+    --agent-warning: #f59e0b;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root, :host {
+      /* Dark Theme - Glassmorphism */
+      --agent-primary: #818cf8;
+      --agent-primary-hover: #6366f1;
+      --agent-surface: rgba(30, 30, 46, 0.6);
+      --agent-surface-light: rgba(40, 40, 60, 0.8);
+      --agent-bg: #0f0d14; /* Deep dark backdrop instead of transparent */
+      --agent-text: #f3f4f6;
+      --agent-text-muted: #9ca3af;
+      --agent-success: #34d399;
+      --agent-error: #f87171;
+      --agent-warning: #fbbf24;
+    }
+  }
+
+  .agent-root {
+    @apply text-agent-text text-sm font-sans antialiased;
+    line-height: 1.5;
+  }
+}
