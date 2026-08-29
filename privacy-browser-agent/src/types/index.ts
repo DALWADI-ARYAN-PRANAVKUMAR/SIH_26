@@ -46,6 +46,7 @@ export interface PerceptionResult {
   pageText: string;
   url: string;
   title: string;
+  pageContext?: PageContext;
 }
 
 /** Input/output of the Privacy module — redaction. */
@@ -80,12 +81,73 @@ export type ExtensionMessageType =
   | "GET_STATUS"
   | "SET_STATUS"
   | "STATUS_CHANGED"
-  | "TOGGLE_ASSISTANT";
+  | "TOGGLE_ASSISTANT"
+  | "GET_PAGE_CONTEXT";
 
 export interface ExtensionMessage {
   type: ExtensionMessageType;
   payload?: Record<string, unknown>;
 }
+
+// --------------- Phase 2: Page Perception ---------------
+
+export interface HeadingContext {
+  level: number;
+  text: string;
+}
+
+export interface InteractiveElement {
+  id: string; // Registry internal ID (e.g. button_001)
+  type: string; // e.g. "button", "a", "input"
+  text?: string;
+  ariaLabel?: string | null;
+  role?: string | null;
+  title?: string | null;
+  href?: string | null;
+  disabled?: boolean;
+}
+
+export interface InputElement extends InteractiveElement {
+  inputType?: string;
+  placeholder?: string | null;
+  name?: string | null;
+  hasValue?: boolean;
+  value?: string; // [REDACTED] for passwords
+  checked?: boolean;
+  required?: boolean;
+}
+
+export interface SelectElement extends InteractiveElement {
+  name?: string | null;
+  options: { text: string; value: string; selected: boolean }[];
+}
+
+export interface FormContext {
+  id: string; // Internal ID
+  name?: string | null;
+  action?: string | null;
+}
+
+export interface PageContext {
+  page: {
+    url: string;
+    title: string;
+    domain: string;
+    language?: string;
+  };
+  headings: HeadingContext[];
+  text: string[];
+  elements: {
+    buttons: InteractiveElement[];
+    links: InteractiveElement[];
+    inputs: InputElement[];
+    selects: SelectElement[];
+    checkboxes: InputElement[];
+    forms: FormContext[];
+  };
+  timestamp: number;
+}
+
 
 // --------------- Storage ---------------
 

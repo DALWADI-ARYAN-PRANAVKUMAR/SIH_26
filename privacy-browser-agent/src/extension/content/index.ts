@@ -18,9 +18,11 @@ import { Assistant } from "@/assistant/Assistant";
 import { initializeAssistant } from "@/core/AssistantController";
 import { isAssistantEnabled, onStorageChange } from "@/extension/storage";
 import { onMessage } from "@/extension/messaging";
+import { initContextManager, getCurrentPageContext } from "@/perception/ContextManager";
 import type { ExtensionMessage } from "@/types";
 
 console.log("[Privacy Agent] Content script loaded");
+initContextManager();
 
 let reactRoot: Root | null = null;
 let hostElement: HTMLDivElement | null = null;
@@ -98,6 +100,10 @@ async function init(): Promise<void> {
           fullMount();
         }
         sendResponse({ success: true });
+      }
+      if (message.type === "GET_PAGE_CONTEXT") {
+        const context = getCurrentPageContext();
+        sendResponse({ success: true, context });
       }
     },
   );
