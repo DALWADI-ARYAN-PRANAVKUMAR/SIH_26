@@ -114,6 +114,78 @@ async def chat_endpoint(request: ChatRequest):
             confidence=0.0
         )
 
+import json
+
+class PlanRequest(BaseModel):
+    task: str
+    pageContext: Dict[str, Any]
+
+class ActionPlan(BaseModel):
+    type: str = "action_plan"
+    message: str
+    actions: List[Dict[str, Any]]
+    requiresConfirmation: bool = False
+
+PLANNER_SYSTEM_PROMPT = """You are a browser task planning model.
+
+You receive:
+1. User task
+2. Current structured webpage context
+
+Your job is to produce a strictly structured action plan.
+
+Rules:
+- Use only available element IDs from the context.
+- Never invent element IDs.
+- Never invent page elements.
+- Do not output JavaScript.
+- Do not output arbitrary code.
+- Prefer one or a small number of actions at a time.
+- If the page state is insufficient, request re-observation/replanning by returning no actions.
+- High-risk operations must require user confirmation (requiresConfirmation: true).
+- Return ONLY valid JSON matching this schema:
+{
+  "type": "action_plan",
+  "message": "What you are about to do",
+  "actions": [
+    { "action": "type", "target": { "elementId": "input_001" }, "value": "text" },
+    { "action": "click", "target": { "elementId": "button_002" } }
+  ],
+  "requiresConfirmation": false
+}
+"""
+
+@app.post("/api/agent/plan", response_model=ActionPlan)
+async def plan_endpoint(request: PlanRequest):
+    if not client:
+        raise HTTPException(status_code=500, detail="LLM not configured")
+
+    user_prompt = f"User Task: {request.task}\n\n=== PAGE CONTEXT ===\n{json.dumps(request.pageContext, indent=2)}"
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=f"{PLANNER_SYSTEM_PROMPT}\n\n{user_prompt}",
+        )
+        
+        # Parse JSON from response
+        # Gemini might wrap in ```json ... ```
+        text = response.text.strip()
+        if text.startswith("```json"):
+            text = text[7:-3].strip()
+        elif text.startswith("```"):
+            text = text[3:-3].strip()
+            
+        data = json.loads(text)
+        return ActionPlan(**data)
+    except Exception as e:
+        print(f"Error calling LLM for plan: {e}")
+        return ActionPlan(
+            message=f"I encountered an error while planning: {str(e)}",
+            actions=[],
+            requiresConfirmation=False
+        )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

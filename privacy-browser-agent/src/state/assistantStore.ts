@@ -15,6 +15,18 @@ export const useAssistantStore = create<AssistantStoreState>((set) => ({
   state: "IDLE",
   setState: (state) => set({ state }),
 
+  // Phase 3 Task Management
+  taskState: "IDLE",
+  setTaskState: (state) => set({ taskState: state }),
+  activeTask: null,
+  setActiveTask: (task) => set({ activeTask: task }),
+  taskLogs: [],
+  addTaskLog: (log) => set((s) => ({ taskLogs: [...s.taskLogs, log] })),
+  clearTaskLogs: () => set({ taskLogs: [] }),
+  pendingPlan: null,
+  setPendingPlan: (plan) => set({ pendingPlan: plan }),
+  cancelTask: () => set({ taskState: "CANCELLED", activeTask: null, pendingPlan: null }),
+
   // Chat messages
   messages: [],
   addMessage: (message: Message) =>
@@ -24,7 +36,7 @@ export const useAssistantStore = create<AssistantStoreState>((set) => ({
   // Activity log
   activities: [],
   addActivity: (activity: ActivityEvent) =>
-    set((s) => ({ activities: [...s.activities, activity] })),
+    set((s) => ({ activities: [activity, ...s.activities].slice(0, 50) })),
   updateActivity: (id: string, updates: Partial<ActivityEvent>) =>
     set((s) => ({
       activities: s.activities.map((a) =>
@@ -48,10 +60,15 @@ let isHydrating = false;
 
 // 1. Listen for local store changes and push to chrome.storage
 useAssistantStore.subscribe((state) => {
-  if (isHydrating || !chrome?.storage?.local) return;
+  if (isHydrating || typeof chrome === "undefined" || !chrome.storage?.local) return;
+  
   // We sync the entire state EXCEPT isPanelOpen (which is local to each context)
   const syncState = {
     state: state.state,
+    taskState: state.taskState,
+    activeTask: state.activeTask,
+    taskLogs: state.taskLogs,
+    pendingPlan: state.pendingPlan,
     messages: state.messages,
     activities: state.activities,
     activeTab: state.activeTab,
@@ -60,7 +77,7 @@ useAssistantStore.subscribe((state) => {
 });
 
 // 2. Listen for external changes (from other tabs/side panel)
-if (chrome?.storage?.onChanged) {
+if (typeof chrome !== "undefined" && chrome.storage?.onChanged) {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "local" && changes[STORE_KEY]) {
       const newState = changes[STORE_KEY].newValue;
@@ -68,6 +85,10 @@ if (chrome?.storage?.onChanged) {
         isHydrating = true;
         useAssistantStore.setState({
           state: newState.state,
+          taskState: newState.taskState,
+          activeTask: newState.activeTask,
+          taskLogs: newState.taskLogs,
+          pendingPlan: newState.pendingPlan,
           messages: newState.messages,
           activities: newState.activities,
           activeTab: newState.activeTab,

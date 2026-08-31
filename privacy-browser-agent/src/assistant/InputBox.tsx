@@ -40,7 +40,7 @@ export const InputBox: React.FC = () => {
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={isProcessing ? "Processing..." : "Type a message..."}
+        placeholder={isProcessing ? "Processing..." : "Type '/do' for actions, or chat..."}
         disabled={isProcessing}
         className="flex-1 bg-agent-surface border border-agent-surface-light rounded-lg px-3 py-2 text-sm text-agent-text placeholder-agent-text-muted outline-none focus:border-agent-primary focus:ring-1 focus:ring-agent-primary disabled:opacity-50 disabled:cursor-not-allowed"
       />

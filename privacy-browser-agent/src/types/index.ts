@@ -82,7 +82,8 @@ export type ExtensionMessageType =
   | "SET_STATUS"
   | "STATUS_CHANGED"
   | "TOGGLE_ASSISTANT"
-  | "GET_PAGE_CONTEXT";
+  | "GET_PAGE_CONTEXT"
+  | "EXECUTE_ACTION";
 
 export interface ExtensionMessage {
   type: ExtensionMessageType;
@@ -149,6 +150,94 @@ export interface PageContext {
 }
 
 
+// --------------- Phase 3: Action Engine ---------------
+
+export type TaskState = 
+  | "IDLE" 
+  | "UNDERSTANDING" 
+  | "PLANNING" 
+  | "AWAITING_CONFIRMATION" 
+  | "EXECUTING" 
+  | "VERIFYING" 
+  | "REPLANNING" 
+  | "COMPLETED" 
+  | "FAILED" 
+  | "CANCELLED";
+
+export interface BaseAction {
+  action: string;
+}
+
+export interface ClickAction extends BaseAction {
+  action: "click";
+  target: { elementId: string };
+}
+
+export interface TypeAction extends BaseAction {
+  action: "type";
+  target: { elementId: string };
+  value: string;
+}
+
+export interface SelectAction extends BaseAction {
+  action: "select";
+  target: { elementId: string };
+  value: string;
+}
+
+export interface ScrollAction extends BaseAction {
+  action: "scroll";
+  direction: "up" | "down" | "left" | "right";
+  amount?: number;
+}
+
+export interface NavigateAction extends BaseAction {
+  action: "navigate";
+  url: string;
+}
+
+export interface KeypressAction extends BaseAction {
+  action: "keypress";
+  key: string;
+}
+
+export interface WaitAction extends BaseAction {
+  action: "wait";
+  milliseconds: number;
+}
+
+export type AgentAction = 
+  | ClickAction 
+  | TypeAction 
+  | SelectAction 
+  | ScrollAction 
+  | NavigateAction 
+  | KeypressAction 
+  | WaitAction;
+
+export interface AgentPlan {
+  type: "action_plan";
+  message: string;
+  actions: AgentAction[];
+  requiresConfirmation: boolean;
+}
+
+export interface ActionVerification {
+  success: boolean;
+  action: string;
+  elementId?: string;
+  errorCode?: string;
+  message?: string;
+}
+
+export interface TaskLogEntry {
+  id: string;
+  timestamp: number;
+  message: string;
+  state: TaskState;
+  isError?: boolean;
+}
+
 // --------------- Storage ---------------
 
 export interface AvatarPosition {
@@ -172,6 +261,18 @@ export interface AssistantStoreState {
   // State machine
   state: AssistantState;
   setState: (state: AssistantState) => void;
+
+  // Phase 3 Task Management
+  taskState: TaskState;
+  setTaskState: (state: TaskState) => void;
+  activeTask: string | null;
+  setActiveTask: (task: string | null) => void;
+  taskLogs: TaskLogEntry[];
+  addTaskLog: (log: TaskLogEntry) => void;
+  clearTaskLogs: () => void;
+  pendingPlan: AgentPlan | null;
+  setPendingPlan: (plan: AgentPlan | null) => void;
+  cancelTask: () => void;
 
   // Chat messages
   messages: Message[];

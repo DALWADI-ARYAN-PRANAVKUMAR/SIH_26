@@ -43,6 +43,14 @@ export async function sendMessage(text: string): Promise<void> {
   const trimmed = text.trim();
   if (!trimmed) return;
 
+  // Route Phase 3 actions automatically if starts with slash command, 
+  // or handle as regular chat otherwise
+  if (trimmed.toLowerCase().startsWith("/do ") || trimmed.toLowerCase().startsWith("/task ")) {
+    const taskPrompt = trimmed.replace(/^\/(do|task) /i, "");
+    import("./AgentController").then((mod) => mod.startAgentTask(taskPrompt));
+    return;
+  }
+
   // 1. Add user message
   const userMessage: Message = {
     id: uid(),

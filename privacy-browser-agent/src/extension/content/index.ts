@@ -19,6 +19,7 @@ import { initializeAssistant } from "@/core/AssistantController";
 import { isAssistantEnabled, onStorageChange } from "@/extension/storage";
 import { onMessage } from "@/extension/messaging";
 import { initContextManager, getCurrentPageContext } from "@/perception/ContextManager";
+import { executeDOMAction } from "./executor";
 import type { ExtensionMessage } from "@/types";
 
 console.log("[Privacy Agent] Content script loaded");
@@ -104,6 +105,13 @@ async function init(): Promise<void> {
       if (message.type === "GET_PAGE_CONTEXT") {
         const context = getCurrentPageContext();
         sendResponse({ success: true, context });
+      }
+      if (message.type === "EXECUTE_ACTION" && message.payload) {
+        // Execute action
+        executeDOMAction(message.payload as any).then((result) => {
+          sendResponse(result);
+        });
+        return true;
       }
     },
   );

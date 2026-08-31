@@ -2,24 +2,48 @@
 
 An intelligent, privacy-first browser agent that lives directly inside your web pages. It provides a draggable floating assistant, a native Chrome side panel, and deep page-aware AI understanding without compromising user security.
 
-Currently implemented through **Phase 2**, the agent can actively "read" your current webpage, understand visible text, locate interactive buttons/forms, and use a real AI model to answer questions about the page context—all while strictly redacting sensitive data like passwords.
+## Problem Statement
 
----
+This project addresses SIH26171, focusing on creating a secure, privacy-first AI agent that can actively perceive and interact with webpages locally, shielding user data from cloud exfiltration.
 
-## 🏗️ Project Architecture
+## Vision
 
-This repository is split into three main components:
+SEE LOCALLY ➡️ PROTECT LOCALLY ➡️ REASON ➡️ ACT LOCALLY
 
-1. **`privacy-browser-agent/` (The Chrome Extension)**
-   - Built with React, TypeScript, and Tailwind CSS (Manifest V3).
-   - Injects a Shadow-DOM protected floating avatar into web pages.
-   - Houses the **Page Perception Engine** that extracts page context, filters out hidden elements/scripts, and registers interactive elements.
-2. **`privacy-agent-dashboard/` (The Control Center)**
-   - A companion React web app with a highly tactile Skeuomorphic design.
-   - Allows real-time customization of the agent (size, anime preset avatars, image uploads) synchronized instantly via Chrome Storage.
-3. **`backend/` (The AI Engine)**
-   - A Python FastAPI server that handles secure communication with the LLM (Google Gemini).
-   - Ensures that API keys are never exposed in the browser frontend.
+## Current Status
+
+- **Phase 1 (UI/UX Shell)** — Complete ✅
+- **Phase 2 (Perception Engine)** — Complete ✅
+- **Phase 3 (Browser Action Engine)** — Complete ✅
+
+## Features
+
+### Implemented
+- Chrome Manifest V3 side panel & floating assistant.
+- Local DOM perception (headings, forms, inputs, buttons).
+- Deep privacy filtering (passwords immediately redacted in-memory).
+- Backend LLM Planner (FastAPI + Google Gemini).
+- Safe Action Execution (clicks, typing, navigation, scrolling).
+- Strict JSON-based action schema with user-confirmation for actions.
+
+### In Progress / Planned
+- Phase 4: Autonomous Vision (Local screenshots).
+- Phase 5: Zero-trust local model fallback.
+
+## Architecture
+
+```mermaid
+flowchart TD
+    User --> Assistant
+    Assistant --> Perception
+    Perception --> PageContext
+    PageContext --> Planner
+    Planner --> Validator
+    Validator --> Executor
+    Executor --> Browser
+    Browser --> Verifier
+    Verifier --> Perception
+```
 
 ---
 
@@ -70,42 +94,31 @@ This repository is split into three main components:
 4. Select the `privacy-browser-agent/dist` folder.
 5. *Tip: Pin the "Privacy Browser Agent" icon to your Chrome toolbar for easy access!*
 
-### 4. (Optional) Run the Control Center Dashboard
-1. Navigate to the dashboard directory:
-   ```bash
-   cd privacy-agent-dashboard
-   ```
-2. Install and run:
-   ```bash
-   npm install
-   npm run dev
-   ```
-3. Open `http://localhost:5173` in your browser to customize your floating avatar's appearance in real-time.
-
 ---
 
 ## 🧪 End-to-End Testing Guide
 
-Once everything is installed and running, follow these steps to verify Phase 2 features:
+We have created a safe local **Test Playground** specifically for verifying Phase 3 actions without affecting real sites.
 
-### Test 1: Page Awareness (Wikipedia)
-1. Open a Wikipedia article (e.g., [Apollo 11](https://en.wikipedia.org/wiki/Apollo_11)).
-2. Open the Assistant Side Panel (Click the extension icon, or press `Ctrl+Shift+E`).
-3. Type: *"What is this page?"* or *"Summarize the main points of this article."*
-4. **Expected Result:** The assistant should successfully extract the webpage's paragraphs and headers, send them to the backend, and reply with an accurate summary based *only* on the current page.
+### Test 1: Using the Test Playground
+1. Open `docs/test-playground.html` in your Chrome browser.
+2. Open the Assistant Side Panel.
+3. Type: `/do Type Kavya in the Name field`
+4. **Expected Result:** 
+   - The task dashboard opens in the Side Panel.
+   - The agent perceives the DOM, identifies the "Name" input.
+   - The LLM returns a structured `type` action.
+   - The input is safely populated with "Kavya".
 
-### Test 2: Element Detection (Forms & Buttons)
-1. Navigate to any website with forms or buttons (e.g., a GitHub repository page).
-2. Ask the assistant: *"What buttons are available to click on this page?"* or *"What inputs are on this screen?"*
-3. **Expected Result:** The assistant will list the interactive elements currently visible on the page (e.g., "I see a Sign In button, a Search input," etc.).
+### Test 2: Multi-step Actions
+1. In the Test Playground, ask: `/do Type Ahmedabad in From, Delhi in To, and click Search`
+2. **Expected Result:** The agent plans a sequence of actions, executes them in order, verifies DOM updates, and triggers the search button alert.
 
-### Test 3: Dynamic Page Updates
-1. Stay on the same tab, but click a link to navigate to a completely different webpage.
-2. Ask the assistant: *"Where am I now?"*
-3. **Expected Result:** The Context Manager detects the page change automatically. The AI should correctly identify your new location without you needing to reload the extension.
+### Test 3: Password Redaction (Safety First)
+1. On the Test Playground, ask: `/do Type secret123 in the password field.`
+2. Check the Action Log in the Side Panel or the browser console.
+3. **Expected Result:** The action is completed, but the `PageContext` sent to the backend completely redacts the actual password string (`[REDACTED]`).
 
-### Test 4: Privacy & Password Redaction
-1. Go to any login page (e.g., `https://github.com/login`).
-2. Type a fake password into the password box.
-3. Open the Developer Tools (`F12`), go to the **Console**, and look for the `[Privacy Agent] Page Context extracted` debug log. Expand the object to view the extracted inputs.
-4. **Expected Result:** You will see the password field was detected, but its value is strictly set to `[REDACTED]`. The actual password text is purposefully destroyed before it ever reaches the backend AI.
+### Test 4: Navigation
+1. On any page, type: `/do Open the Products page`
+2. **Expected Result:** The agent finds the corresponding link and navigates the browser cleanly.
