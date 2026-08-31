@@ -17,7 +17,7 @@ export const SidePanelApp: React.FC = () => {
   const state = useAssistantStore((s) => s.state);
 
   return (
-    <div className="flex flex-col h-full w-full bg-agent-bg overflow-hidden text-agent-text">
+    <div className="absolute inset-0 flex flex-col bg-agent-bg overflow-hidden text-agent-text">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-agent-surface backdrop-blur-md border-b border-agent-surface-light">
         <div className="flex items-center gap-2">
