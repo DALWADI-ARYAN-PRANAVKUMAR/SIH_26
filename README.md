@@ -1,70 +1,81 @@
-# Privacy Browser Agent 🛡️ (SIH_26)
+<div align="center">
+  <h1>🛡️ Privacy-Preserving AI Browser Agent</h1>
+  <p><strong>SIH26171 – On-device Visual Perception for Lightweight Browser Agents</strong></p>
+  <p>An intelligent, privacy-first browser agent that lives directly inside your web pages. It provides a draggable floating assistant, a native Chrome side panel, and deep page-aware AI understanding without compromising user security.</p>
+</div>
 
-An intelligent, privacy-first browser agent that lives directly inside your web pages. It provides a draggable floating assistant, a native Chrome side panel, and deep page-aware AI understanding without compromising user security.
+<hr />
 
-## Problem Statement
+## 🌟 Problem Statement & Vision
 
-This project addresses SIH26171, focusing on creating a secure, privacy-first AI agent that can actively perceive and interact with webpages locally, shielding user data from cloud exfiltration.
+**Problem (SIH26171):** Current AI browser agents exfiltrate massive amounts of sensitive user data (HTML, DOM, personal information) to cloud servers to function. We need an agent that can actively perceive and interact with webpages *locally*, shielding user data from cloud exfiltration.
 
-## Vision
+**Our Vision:** `SEE LOCALLY ➔ PROTECT LOCALLY ➔ REASON ➔ ACT LOCALLY`
 
-SEE LOCALLY ➡️ PROTECT LOCALLY ➡️ REASON ➡️ ACT LOCALLY
+By performing DOM extraction and strict privacy redaction purely on the client side, we ensure that the AI backend only ever receives semantic placeholders, never raw personal data.
 
-## Current Status
+---
 
-- **Phase 1 (UI/UX Shell)** — Complete ✅
-- **Phase 2 (Perception Engine)** — Complete ✅
-- **Phase 3 (Browser Action Engine)** — Complete ✅
-- **Phase 4 (Local Privacy Firewall)** — Complete ✅
+## 🚀 Current Status & Features
 
-## Features
+- **Phase 1: UI/UX Shell** — Complete ✅
+  - Chrome Manifest V3 side panel & floating assistant.
+  - Shadow DOM isolation preventing CSS bleeding.
+  - State synchronization across tabs via Chrome Storage.
+- **Phase 2: Perception Engine** — Complete ✅
+  - Local DOM perception extracting headings, forms, inputs, and buttons.
+  - Invisible element filtering & DOM minimization.
+  - Temporary local Element Registry generation.
+- **Phase 3: Browser Action Engine** — Complete ✅
+  - Safe Action Execution (clicks, typing, navigation, scrolling).
+  - Strict JSON-based action schema with user-confirmation for high-risk actions.
+  - Zero `eval()` or dangerous JS injection.
+- **Phase 4: Local Privacy Firewall** — Complete ✅
+  - Deep privacy filtering via Regex and DOM metadata heuristics.
+  - Detects and redacts Passwords, OTPs, API Keys, Emails, Phones.
+  - **Indian PII Support:** Aadhaar, PAN, UPI, IFSC.
+  - Semantic placeholder replacement (e.g., `john@example.com` becomes `[EMAIL]`).
+  - Real-time Privacy Audit Dashboard in the Side Panel.
 
-### Implemented
-- Chrome Manifest V3 side panel & floating assistant.
-- Local DOM perception (headings, forms, inputs, buttons).
-- Deep privacy filtering (passwords immediately redacted in-memory).
-- Backend LLM Planner (FastAPI + Google Gemini).
-- Safe Action Execution (clicks, typing, navigation, scrolling).
-- Strict JSON-based action schema with user-confirmation for actions.
-- Local Privacy Firewall (Detects and redacts PII like Emails, Passwords, Aadhaar, PAN, Cards *before* hitting network).
+---
 
-### In Progress / Planned
-- Phase 5: Autonomous Vision (Local screenshots, Visual Privacy).
-- Phase 6: Voice (STT + TTS).
+## 🏗️ Architecture
 
-## Privacy Architecture
+### 1. Privacy Architecture (Zero-Leakage)
 
-Raw browser information is processed locally. Sensitive information is detected and redacted locally. Only sanitized context is allowed to reach the server.
+Raw browser information is processed strictly within the local Chrome Extension sandbox. Sensitive information is mutated into semantic placeholders before transmission. 
 
 ```mermaid
 flowchart TD
-    Browser --> DOM
-    DOM --> Perception
-    Perception --> Privacy
-    Privacy -->|Sensitive| Redact
-    Privacy -->|Safe| Allow
-    Redact --> Sanitized
-    Allow --> Sanitized
-    Sanitized --> Backend
-    Backend --> LLM
+    Browser((Browser DOM)) --> Ext[Content Script]
+    Ext --> Perception[Perception Engine]
+    Perception --> Raw[Raw PageContext]
+    Raw --> Privacy[Privacy Firewall]
+    Privacy -->|Redacts PII| Sanitized[Sanitized Context]
+    Sanitized --> Network((Internet))
+    Network --> Backend[Backend Planner]
 ```
 
-## System Architecture
+### 2. System Execution Loop
 
 ```mermaid
-flowchart TD
+flowchart LR
     User --> Assistant
     Assistant --> Perception
-    Perception --> PageContext
-    PageContext --> PrivacyEngine
+    Perception --> PrivacyEngine
     PrivacyEngine --> SanitizedContext
     SanitizedContext --> Planner
     Planner --> Validator
     Validator --> Executor
     Executor --> Browser
-    Browser --> Verifier
-    Verifier --> Perception
 ```
+
+---
+
+## 🛠️ Implementation Details
+
+For a granular, step-by-step breakdown of how the extension, the action engine, and the privacy firewall were engineered from scratch, please read:
+👉 **[Implementation Steps & Engineering Deep Dive](docs/implementation-steps.md)**
 
 ---
 
@@ -75,7 +86,9 @@ flowchart TD
 - [Python](https://www.python.org/downloads/) (3.9+ recommended)
 - Google Chrome browser
 
-### 1. Start the Backend AI Server
+### Step 1: Start the Backend AI Server
+The backend requires an LLM API key (Google Gemini) to generate action plans.
+
 1. Navigate to the backend directory:
    ```bash
    cd backend
@@ -85,15 +98,15 @@ flowchart TD
    pip install -r requirements.txt
    ```
 3. Set up your API key:
-   - Rename `.env.example` to `.env`.
-   - Open `.env` and add your Google Gemini API key: `GEMINI_API_KEY=your_key_here`
-4. Run the server:
+   - Rename `.env.example` to `.env` (or create one).
+   - Add your API key: `GEMINI_API_KEY=your_google_gemini_api_key`
+4. Run the local planner server:
    ```bash
    uvicorn main:app --reload
    ```
-   *The backend will now be running on `http://localhost:8000`.*
+   *The backend will now be listening on `http://localhost:8000`.*
 
-### 2. Build the Chrome Extension
+### Step 2: Build the Chrome Extension
 1. Open a new terminal and navigate to the extension directory:
    ```bash
    cd privacy-browser-agent
@@ -102,13 +115,13 @@ flowchart TD
    ```bash
    npm install
    ```
-3. Build the extension:
+3. Compile and build the extension:
    ```bash
    npm run build
    ```
-   *This will generate a `dist/` folder containing the final extension.*
+   *This generates a `dist/` folder containing the compiled extension.*
 
-### 3. Load the Extension into Chrome
+### Step 3: Load the Extension into Chrome
 1. Open Google Chrome and navigate to `chrome://extensions/`.
 2. Turn on **"Developer mode"** (toggle in the top right corner).
 3. Click **"Load unpacked"** in the top left.
@@ -119,27 +132,30 @@ flowchart TD
 
 ## 🧪 End-to-End Testing Guide
 
-We have created a safe local **Test Playground** specifically for verifying Phase 3 actions without affecting real sites.
+We have created local sandboxes for you to safely test the Action Engine and the Privacy Firewall.
 
-### Test 1: Using the Test Playground
-1. Open `docs/test-playground.html` in your Chrome browser.
+### 1. Testing the Privacy Firewall
+1. Open [docs/privacy-test.html](docs/privacy-test.html) in Chrome. This page is filled with mock Aadhaar, PAN, Credit Cards, and passwords.
 2. Open the Assistant Side Panel.
-3. Type: `/do Type Kavya in the Name field`
+3. Observe the **Privacy Firewall** tab. It will instantly show that it inspected elements and actively redacted sensitive data locally.
+4. To verify zero network leakage, open the **Network Tab** in your Chrome DevTools, ask the agent a question, and inspect the `POST /api/agent/plan` payload. You will see placeholders like `[EMAIL]` and `[AADHAAR]` instead of the raw data.
+
+### 2. Testing the Action Engine
+1. Open [docs/test-playground.html](docs/test-playground.html) in Chrome.
+2. Open the Side Panel Chat.
+3. Type: `/do Type Kavya in the Name field and click Submit`
 4. **Expected Result:** 
-   - The task dashboard opens in the Side Panel.
-   - The agent perceives the DOM, identifies the "Name" input.
-   - The LLM returns a structured `type` action.
-   - The input is safely populated with "Kavya".
+   - The agent perceives the DOM.
+   - The LLM creates a structured `type` and `click` action plan.
+   - The local executor physically types the text and clicks the button, triggering the success alert.
 
-### Test 2: Multi-step Actions
-1. In the Test Playground, ask: `/do Type Ahmedabad in From, Delhi in To, and click Search`
-2. **Expected Result:** The agent plans a sequence of actions, executes them in order, verifies DOM updates, and triggers the search button alert.
+---
 
-### Test 3: Password Redaction (Safety First)
-1. On the Test Playground, ask: `/do Type secret123 in the password field.`
-2. Check the Action Log in the Side Panel or the browser console.
-3. **Expected Result:** The action is completed, but the `PageContext` sent to the backend completely redacts the actual password string (`[REDACTED]`).
+## 📚 Documentation Directory
 
-### Test 4: Navigation
-1. On any page, type: `/do Open the Products page`
-2. **Expected Result:** The agent finds the corresponding link and navigates the browser cleanly.
+- **[Privacy Firewall Architecture](docs/privacy.md)**
+- **[Security Threat Model](docs/security-threat-model.md)**
+- **[Privacy Testing Guide](docs/privacy-testing.md)**
+- **[Full Implementation Steps](docs/implementation-steps.md)**
+- **[Changelog](CHANGELOG.md)**
+- **[Future Roadmap](docs/roadmap.md)**
