@@ -5,7 +5,7 @@
 
 import { useAssistantStore } from "@/state/assistantStore";
 import { perceivePage } from "./Perception";
-import type { AgentPlan, AgentAction, TaskLogEntry, PageContext } from "@/types";
+import type { AgentPlan, AgentAction, TaskLogEntry } from "@/types";
 
 const MAX_STEPS = 10;
 
@@ -57,9 +57,20 @@ export async function startAgentTask(taskPrompt: string) {
       }
 
       store.setTaskState("PLANNING");
+      logStep("Applying Privacy Firewall...");
+      const { PrivacyEngine } = await import("@/privacy/PrivacyEngine");
+      const sanitizedContext = PrivacyEngine.sanitize(pageContext);
+      
+      const pData = sanitizedContext.privacy;
+      store.setPrivacyMetadata(pData); // Publish to UI
+
+      if (pData.status === "PROTECTED") {
+        logStep(`Privacy Scan: 🔒 Protected. Redacted ${pData.elementsRedacted} sensitive elements.`);
+      }
+
       logStep("Requesting action plan from backend...");
       
-      const plan = await fetchActionPlan(taskPrompt, pageContext);
+      const plan = await fetchActionPlan(taskPrompt, sanitizedContext);
       
       if (!plan || plan.actions.length === 0) {
         store.setTaskState("COMPLETED");
@@ -113,7 +124,7 @@ export async function confirmPlan() {
   }
 }
 
-async function fetchActionPlan(taskPrompt: string, context: PageContext): Promise<AgentPlan> {
+async function fetchActionPlan(taskPrompt: string, context: any): Promise<AgentPlan> {
   const response = await fetch("http://localhost:8000/api/agent/plan", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

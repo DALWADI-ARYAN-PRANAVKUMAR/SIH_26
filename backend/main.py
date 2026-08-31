@@ -143,7 +143,14 @@ Rules:
 - Prefer one or a small number of actions at a time.
 - If the page state is insufficient, request re-observation/replanning by returning no actions.
 - High-risk operations must require user confirmation (requiresConfirmation: true).
-- Return ONLY valid JSON matching this schema:
+
+PRIVACY RULES (CRITICAL):
+- Redacted values are intentionally unavailable (e.g. [EMAIL], [PASSWORD], [CARD], [PERSON]). 
+- Do not infer, reconstruct, guess, or request the original sensitive value. 
+- Treat placeholders as opaque semantic entities. You can type these placeholders literally if requested to fill a field, but usually you should just type what the user asked in their prompt.
+- Do not expose passwords.
+
+Return ONLY valid JSON matching this schema:
 {
   "type": "action_plan",
   "message": "What you are about to do",

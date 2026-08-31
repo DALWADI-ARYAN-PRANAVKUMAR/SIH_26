@@ -15,6 +15,7 @@ SEE LOCALLY ➡️ PROTECT LOCALLY ➡️ REASON ➡️ ACT LOCALLY
 - **Phase 1 (UI/UX Shell)** — Complete ✅
 - **Phase 2 (Perception Engine)** — Complete ✅
 - **Phase 3 (Browser Action Engine)** — Complete ✅
+- **Phase 4 (Local Privacy Firewall)** — Complete ✅
 
 ## Features
 
@@ -25,19 +26,39 @@ SEE LOCALLY ➡️ PROTECT LOCALLY ➡️ REASON ➡️ ACT LOCALLY
 - Backend LLM Planner (FastAPI + Google Gemini).
 - Safe Action Execution (clicks, typing, navigation, scrolling).
 - Strict JSON-based action schema with user-confirmation for actions.
+- Local Privacy Firewall (Detects and redacts PII like Emails, Passwords, Aadhaar, PAN, Cards *before* hitting network).
 
 ### In Progress / Planned
-- Phase 4: Autonomous Vision (Local screenshots).
-- Phase 5: Zero-trust local model fallback.
+- Phase 5: Autonomous Vision (Local screenshots, Visual Privacy).
+- Phase 6: Voice (STT + TTS).
 
-## Architecture
+## Privacy Architecture
+
+Raw browser information is processed locally. Sensitive information is detected and redacted locally. Only sanitized context is allowed to reach the server.
+
+```mermaid
+flowchart TD
+    Browser --> DOM
+    DOM --> Perception
+    Perception --> Privacy
+    Privacy -->|Sensitive| Redact
+    Privacy -->|Safe| Allow
+    Redact --> Sanitized
+    Allow --> Sanitized
+    Sanitized --> Backend
+    Backend --> LLM
+```
+
+## System Architecture
 
 ```mermaid
 flowchart TD
     User --> Assistant
     Assistant --> Perception
     Perception --> PageContext
-    PageContext --> Planner
+    PageContext --> PrivacyEngine
+    PrivacyEngine --> SanitizedContext
+    SanitizedContext --> Planner
     Planner --> Validator
     Validator --> Executor
     Executor --> Browser

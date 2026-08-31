@@ -274,6 +274,9 @@ export interface AssistantStoreState {
   setPendingPlan: (plan: AgentPlan | null) => void;
   cancelTask: () => void;
 
+  lastPrivacyMetadata: any | null;
+  setPrivacyMetadata: (meta: any | null) => void;
+
   // Chat messages
   messages: Message[];
   addMessage: (message: Message) => void;

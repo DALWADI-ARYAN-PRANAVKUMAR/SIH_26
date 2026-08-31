@@ -29,7 +29,7 @@ export async function generateResponse(
       },
       body: JSON.stringify({
         message: messageToSend,
-        pageContext: perception.pageContext || null
+        pageContext: perception.pageContext ? (await import("@/privacy/PrivacyEngine")).PrivacyEngine.sanitize(perception.pageContext) : null
       }),
     });
 

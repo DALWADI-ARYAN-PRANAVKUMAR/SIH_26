@@ -27,6 +27,9 @@ export const useAssistantStore = create<AssistantStoreState>((set) => ({
   setPendingPlan: (plan) => set({ pendingPlan: plan }),
   cancelTask: () => set({ taskState: "CANCELLED", activeTask: null, pendingPlan: null }),
 
+  lastPrivacyMetadata: null,
+  setPrivacyMetadata: (meta: any) => set({ lastPrivacyMetadata: meta }),
+
   // Chat messages
   messages: [],
   addMessage: (message: Message) =>
