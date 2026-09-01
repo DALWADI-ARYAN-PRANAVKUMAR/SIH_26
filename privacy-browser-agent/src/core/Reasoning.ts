@@ -22,6 +22,22 @@ export async function generateResponse(
   const messageToSend = privacy.sanitizedText || userMessage;
 
   try {
+    let sanitizedContext = null;
+    if (perception.pageContext) {
+      const { PrivacyEngine } = await import("@/privacy/PrivacyEngine");
+      const { useAssistantStore } = await import("@/state/assistantStore");
+      
+      const privStart = performance.now();
+      sanitizedContext = await PrivacyEngine.sanitize(perception.pageContext);
+      const privLatency = Math.round(performance.now() - privStart);
+      
+      // Update system metrics
+      useAssistantStore.getState().updateSystemMetrics({ privacyLatencyMs: privLatency });
+      
+      // Update privacy metadata for UI
+      useAssistantStore.getState().setPrivacyMetadata(sanitizedContext.privacy);
+    }
+
     const response = await fetch("http://localhost:8000/api/chat", {
       method: "POST",
       headers: {
@@ -29,7 +45,7 @@ export async function generateResponse(
       },
       body: JSON.stringify({
         message: messageToSend,
-        pageContext: perception.pageContext ? (await import("@/privacy/PrivacyEngine")).PrivacyEngine.sanitize(perception.pageContext) : null
+        pageContext: sanitizedContext
       }),
     });
 

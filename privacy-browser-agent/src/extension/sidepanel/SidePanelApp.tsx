@@ -18,9 +18,7 @@ export const SidePanelApp: React.FC = () => {
   const setActiveTab = useAssistantStore((s) => s.setActiveTab);
   const state = useAssistantStore((s) => s.state);
 
-  const isFullScreenTab = 
-    new URLSearchParams(window.location.search).get("mode") === "tab" || 
-    window.innerWidth > 600;
+
 
   return (
     <div className="absolute inset-0 flex flex-col bg-agent-bg overflow-hidden text-agent-text">
@@ -37,32 +35,19 @@ export const SidePanelApp: React.FC = () => {
           )}
         </div>
         
-        {/* Easy Access Expand / Close Button */}
-        {isFullScreenTab ? (
-          <button
-            onClick={() => {
-              window.close(); // Close the tab
-            }}
-            className="text-agent-text-muted hover:text-agent-error w-7 h-7 flex items-center justify-center rounded-md hover:bg-agent-surface-light transition-colors"
-            title="Close Tab"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        ) : (
-          <button
-            onClick={() => {
-              chrome.tabs.create({ url: chrome.runtime.getURL("src/extension/sidepanel/sidepanel.html?mode=tab") });
-            }}
-            className="text-agent-text-muted hover:text-agent-text w-7 h-7 flex items-center justify-center rounded-md hover:bg-agent-surface-light transition-colors"
-            title="Open in full screen tab"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
-          </button>
-        )}
+        {/* Settings Dashboard Button */}
+        <button
+          onClick={() => {
+            chrome.tabs.create({ url: "http://localhost:3000" });
+          }}
+          className="text-agent-text-muted hover:text-agent-text w-7 h-7 flex items-center justify-center rounded-md hover:bg-agent-surface-light transition-colors"
+          title="Settings Dashboard"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
       </div>
 
       {/* Tab bar */}
