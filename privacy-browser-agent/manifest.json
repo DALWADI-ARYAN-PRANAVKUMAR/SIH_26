@@ -50,6 +50,7 @@
   "side_panel": {
     "default_path": "src/extension/sidepanel/sidepanel.html"
   },
+  "options_page": "src/extension/options/options.html",
   "externally_connectable": {
     "matches": ["http://localhost/*", "http://127.0.0.1/*"]
   }

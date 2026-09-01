@@ -38,7 +38,11 @@ export const SidePanelApp: React.FC = () => {
         {/* Settings Dashboard Button */}
         <button
           onClick={() => {
-            chrome.tabs.create({ url: "http://localhost:3000" });
+            if (chrome.runtime.openOptionsPage) {
+              chrome.runtime.openOptionsPage();
+            } else {
+              window.open(chrome.runtime.getURL('src/extension/options/options.html'));
+            }
           }}
           className="text-agent-text-muted hover:text-agent-text w-7 h-7 flex items-center justify-center rounded-md hover:bg-agent-surface-light transition-colors"
           title="Settings Dashboard"
