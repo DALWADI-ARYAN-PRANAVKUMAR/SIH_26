@@ -4,6 +4,7 @@ import { MessageList } from "@/assistant/MessageList";
 import { InputBox } from "@/assistant/InputBox";
 import { StatusIndicator } from "@/assistant/StatusIndicator";
 import { ActivityPanel } from "@/assistant/ActivityPanel";
+import { SystemMetrics } from "@/assistant/SystemMetrics";
 
 const TABS = [
   { key: "chat" as const, label: "Chat" },
@@ -89,6 +90,9 @@ export const SidePanelApp: React.FC = () => {
       )}
       {activeTab === "activity" && <ActivityPanel />}
       {activeTab === "privacy" && <StatusIndicator />}
+
+      {/* Floating System Metrics (Glassmorphism) */}
+      <SystemMetrics />
     </div>
   );
 };

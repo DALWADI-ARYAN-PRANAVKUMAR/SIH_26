@@ -59,10 +59,13 @@ export async function startAgentTask(taskPrompt: string) {
       store.setTaskState("PLANNING");
       logStep("Applying Privacy Firewall...");
       const { PrivacyEngine } = await import("@/privacy/PrivacyEngine");
-      const sanitizedContext = PrivacyEngine.sanitize(pageContext);
+      const privStart = performance.now();
+      const sanitizedContext = await PrivacyEngine.sanitize(pageContext);
+      const privLatency = Math.round(performance.now() - privStart);
       
       const pData = sanitizedContext.privacy;
       store.setPrivacyMetadata(pData); // Publish to UI
+      store.updateSystemMetrics({ privacyLatencyMs: privLatency });
 
       if (pData.status === "PROTECTED") {
         logStep(`Privacy Scan: 🔒 Protected. Redacted ${pData.elementsRedacted} sensitive elements.`);

@@ -56,6 +56,17 @@ export const useAssistantStore = create<AssistantStoreState>((set) => ({
   // Active tab
   activeTab: "chat",
   setActiveTab: (tab) => set({ activeTab: tab }),
+
+  // System Metrics
+  systemMetrics: {
+    ramUsageMB: 0,
+    visionLatencyMs: 0,
+    privacyLatencyMs: 0,
+    gpuActive: false,
+  },
+  updateSystemMetrics: (metrics) => set((s) => ({ 
+    systemMetrics: { ...s.systemMetrics, ...metrics } 
+  })),
 }));
 
 // Setup Cross-Context Synchronization (Content Script <-> Side Panel)

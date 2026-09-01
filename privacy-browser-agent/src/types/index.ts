@@ -298,4 +298,13 @@ export interface AssistantStoreState {
   // Active tab (chat vs activity)
   activeTab: "chat" | "activity" | "privacy";
   setActiveTab: (tab: "chat" | "activity" | "privacy") => void;
+
+  // System Metrics
+  systemMetrics: {
+    ramUsageMB: number;
+    visionLatencyMs: number;
+    privacyLatencyMs: number;
+    gpuActive: boolean;
+  };
+  updateSystemMetrics: (metrics: Partial<AssistantStoreState["systemMetrics"]>) => void;
 }

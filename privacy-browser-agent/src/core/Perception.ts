@@ -50,9 +50,21 @@ export async function perceivePage(userMessage?: string): Promise<PerceptionResu
       if (requiresVision) {
         try {
           const { runVisionPipeline } = await import("../vision/VisionEngine");
+          const { useAssistantStore } = await import("../state/assistantStore");
+          
+          useAssistantStore.getState().updateSystemMetrics({ gpuActive: true });
+          const start = performance.now();
           visualContext = await runVisionPipeline();
+          const latency = Math.round(performance.now() - start);
+          
+          useAssistantStore.getState().updateSystemMetrics({ 
+            gpuActive: false,
+            visionLatencyMs: latency 
+          });
         } catch (e) {
           console.warn("[Privacy Agent] Vision pipeline failed:", e);
+          const { useAssistantStore } = await import("../state/assistantStore");
+          useAssistantStore.getState().updateSystemMetrics({ gpuActive: false });
         }
       }
 
