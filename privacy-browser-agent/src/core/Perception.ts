@@ -12,7 +12,7 @@ import type { PerceptionResult, PageContext, ExtensionMessage } from "@/types";
  * This runs in the Side Panel or Background, so it delegates extraction
  * to the Content Script injected into the active webpage.
  */
-export async function perceivePage(): Promise<PerceptionResult> {
+export async function perceivePage(userMessage?: string): Promise<PerceptionResult> {
   if (typeof chrome === "undefined" || !chrome.tabs) {
     throw new Error("Cannot perceive page: Chrome tabs API unavailable");
   }
@@ -31,11 +31,52 @@ export async function perceivePage(): Promise<PerceptionResult> {
     const response = await chrome.tabs.sendMessage(activeTab.id, message) as { success: boolean; context: PageContext };
     
     if (response?.success && response.context) {
+      const pageContext = response.context;
+      
+      // 3. Optional: Run Vision Pipeline
+      // Only run if user prompted for visual info, or randomly on first load for demonstration
+      // We will export a way to force it, but for now we'll do a simple heuristic
+      let visualContext = undefined;
+      const requiresVision = userMessage && (
+        userMessage.toLowerCase().includes("see") ||
+        userMessage.toLowerCase().includes("visual") ||
+        userMessage.toLowerCase().includes("screen") ||
+        userMessage.toLowerCase().includes("image") ||
+        userMessage.toLowerCase().includes("button") ||
+        userMessage.toLowerCase().includes("layout") ||
+        userMessage.toLowerCase().includes("where")
+      );
+      
+      if (requiresVision) {
+        try {
+          const { runVisionPipeline } = await import("../vision/VisionEngine");
+          visualContext = await runVisionPipeline();
+        } catch (e) {
+          console.warn("[Privacy Agent] Vision pipeline failed:", e);
+        }
+      }
+
+      if (visualContext) {
+        pageContext.visual = visualContext;
+        
+        // Draw debug boxes for visual elements and redactions
+        const boxes = [
+          ...visualContext.elements.map((e: any) => ({ bbox: e.bbox, label: e.type, color: "blue" })),
+          ...visualContext.redactions.map((r: any) => ({ bbox: r.bbox, label: r.category, color: "red" }))
+        ];
+        try {
+          await chrome.tabs.sendMessage(activeTab.id, {
+            type: "DRAW_DEBUG_BOXES",
+            payload: { boxes }
+          });
+        } catch (e) { /* ignore */ }
+      }
+
       return {
-        url: response.context.page.url,
-        title: response.context.page.title,
-        pageText: response.context.text.join(" "),
-        pageContext: response.context
+        url: pageContext.page.url,
+        title: pageContext.page.title,
+        pageText: pageContext.text.join(" "),
+        pageContext: pageContext
       };
     }
     

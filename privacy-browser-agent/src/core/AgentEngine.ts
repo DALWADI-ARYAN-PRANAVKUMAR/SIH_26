@@ -37,7 +37,7 @@ export async function runTurn(
 ): Promise<AgentResponse> {
   // Step 1: Perception
   callbacks?.onPerceptionStart?.();
-  const perception = await perceivePage();
+  const perception = await perceivePage(userMessage);
   callbacks?.onPerceptionDone?.();
 
   // Step 2: Privacy

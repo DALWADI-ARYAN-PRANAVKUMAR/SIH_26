@@ -3,11 +3,14 @@ import { PrivacyFinding, SanitizedPageContext, PrivacyMetadata } from "./types";
 import { detectTextPatterns, redactText } from "./detectors/RegexDetectors";
 import { detectInputSensitivities } from "./detectors/DOMDetectors";
 
+import { applyVisualPrivacy } from "./VisualPrivacyDetector";
+import { redactScreenshot } from "./VisualRedactor";
+
 export class PrivacyEngine {
   /**
    * Main entry point to sanitize a PageContext before it goes to the backend.
    */
-  public static sanitize(context: PageContext): SanitizedPageContext {
+  public static async sanitize(context: PageContext): Promise<SanitizedPageContext> {
     const startTime = performance.now();
     
     const findings: PrivacyFinding[] = [];
@@ -150,6 +153,38 @@ export class PrivacyEngine {
       sanitizedElements.checkboxes.push(checkbox);
     }
 
+    let finalVisual = undefined;
+
+    if (context.visual) {
+      elementsInspected++;
+      // 1. Detect and apply text/element redactions to the visual context
+      const visualWithRedactions = applyVisualPrivacy(context.visual);
+      
+      // 2. Add visual privacy findings to the overall findings list
+      for (const red of visualWithRedactions.redactions) {
+        findings.push({
+          classification: "SENSITIVE",
+          category: red.category,
+          confidence: red.confidence,
+          action: "REDACT",
+          reason: "Visual Object/Text Pattern Match",
+        });
+        elementsRedacted++;
+      }
+
+      // 3. Actually censor the image pixels
+      if (context.visual.rawScreenshotBase64) {
+        finalVisual = await redactScreenshot(
+          context.visual.rawScreenshotBase64,
+          visualWithRedactions
+        );
+        // Do not send raw screenshot
+        delete finalVisual.rawScreenshotBase64;
+      } else {
+        finalVisual = visualWithRedactions;
+      }
+    }
+
     const duration = performance.now() - startTime;
     
     const status = findings.length > 0 ? "PROTECTED" : "NO_SENSITIVE_DATA_FOUND";
@@ -168,6 +203,7 @@ export class PrivacyEngine {
       elements: sanitizedElements,
       text: sanitizedText,
       headings: sanitizedHeadings,
+      visual: finalVisual,
       privacy: privacyMetadata,
       timestamp: context.timestamp,
       isSanitized: true,

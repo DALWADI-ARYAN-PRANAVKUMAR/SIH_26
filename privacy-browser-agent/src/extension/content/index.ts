@@ -113,6 +113,13 @@ async function init(): Promise<void> {
         });
         return true;
       }
+      if (message.type === "DRAW_DEBUG_BOXES" && message.payload) {
+        import("./debugger").then(({ drawDebugBoxes }) => {
+          drawDebugBoxes((message.payload as any).boxes || []);
+          sendResponse({ success: true });
+        });
+        return true;
+      }
     },
   );
 

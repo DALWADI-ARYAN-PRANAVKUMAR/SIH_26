@@ -48,8 +48,8 @@ export async function startAgentTask(taskPrompt: string) {
 
     try {
       store.setTaskState("UNDERSTANDING");
-      logStep("Perceiving current page context...");
-      const perception = await perceivePage();
+      logStep("Perceiving page context (DOM + Vision)...");
+      const perception = await perceivePage(taskPrompt);
       const pageContext = perception.pageContext;
 
       if (!pageContext) {

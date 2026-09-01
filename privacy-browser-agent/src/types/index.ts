@@ -83,7 +83,8 @@ export type ExtensionMessageType =
   | "STATUS_CHANGED"
   | "TOGGLE_ASSISTANT"
   | "GET_PAGE_CONTEXT"
-  | "EXECUTE_ACTION";
+  | "EXECUTE_ACTION"
+  | "DRAW_DEBUG_BOXES";
 
 export interface ExtensionMessage {
   type: ExtensionMessageType;
@@ -146,6 +147,7 @@ export interface PageContext {
     checkboxes: InputElement[];
     forms: FormContext[];
   };
+  visual?: any; // SanitizedVisualContext
   timestamp: number;
 }
 

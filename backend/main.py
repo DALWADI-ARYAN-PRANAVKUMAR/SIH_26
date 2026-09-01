@@ -101,10 +101,22 @@ async def chat_endpoint(request: ChatRequest):
     else:
         user_prompt += "(No page context was provided.)\n"
 
+    contents = [f"{SYSTEM_PROMPT}\n\n{user_prompt}"]
+    
+    if request.pageContext and request.pageContext.get("visual") and request.pageContext["visual"].get("sanitizedScreenshotBase64"):
+        b64_str = request.pageContext["visual"]["sanitizedScreenshotBase64"]
+        if "," in b64_str:
+            b64_str = b64_str.split(",")[1]
+        
+        contents.append({
+            "mime_type": "image/png",
+            "data": b64_str
+        })
+
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=f"{SYSTEM_PROMPT}\n\n{user_prompt}",
+            contents=contents,
         )
         return ChatResponse(reply=response.text, confidence=0.9)
     except Exception as e:
@@ -169,10 +181,22 @@ async def plan_endpoint(request: PlanRequest):
 
     user_prompt = f"User Task: {request.task}\n\n=== PAGE CONTEXT ===\n{json.dumps(request.pageContext, indent=2)}"
 
+    contents = [f"{PLANNER_SYSTEM_PROMPT}\n\n{user_prompt}"]
+    
+    if request.pageContext and request.pageContext.get("visual") and request.pageContext["visual"].get("sanitizedScreenshotBase64"):
+        b64_str = request.pageContext["visual"]["sanitizedScreenshotBase64"]
+        if "," in b64_str:
+            b64_str = b64_str.split(",")[1]
+        
+        contents.append({
+            "mime_type": "image/png",
+            "data": b64_str
+        })
+
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=f"{PLANNER_SYSTEM_PROMPT}\n\n{user_prompt}",
+            contents=contents,
         )
         
         # Parse JSON from response
