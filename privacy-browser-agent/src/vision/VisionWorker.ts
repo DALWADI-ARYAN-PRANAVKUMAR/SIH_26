@@ -3,7 +3,7 @@
  * Web Worker for running on-device Vision Models and OCR.
  */
 
-import { pipeline, env } from "@huggingface/transformers";
+import { pipeline, env } from "@xenova/transformers";
 import Tesseract from "tesseract.js";
 
 // Configure transformers.js for browser environment
@@ -18,14 +18,11 @@ async function loadModels() {
   
   self.postMessage({ type: "status", message: "Loading object detection model..." });
   
-  // Use a tiny object detection model for speed
   objectDetector = await pipeline("object-detection", "Xenova/yolos-tiny", {
-    device: "webgpu", // Try WebGPU first
-  }).catch(async (e) => {
+    device: "webgpu",
+  } as any).catch(async () => {
     self.postMessage({ type: "status", message: "WebGPU unavailable, falling back to WASM..." });
-    return await pipeline("object-detection", "Xenova/yolos-tiny", {
-      device: "wasm",
-    });
+    return await pipeline("object-detection", "Xenova/yolos-tiny");
   });
 
   isLoaded = true;
@@ -51,7 +48,7 @@ async function runInference(imageData: ImageData, width: number, height: number)
     logger: m => console.log(m)
   });
 
-  const ocrBlocks = ocrResult.data.words.map(w => ({
+  const ocrBlocks = (ocrResult.data as any).words.map((w: any) => ({
     text: w.text,
     bbox: {
       x: w.bbox.x0,

@@ -3,11 +3,10 @@
  * Main thread orchestrator for local visual perception.
  */
 import { captureVisibleTab, dataUrlToImageData } from "./ScreenCapture";
-import type { OCRResult, VisualElement, VisualContext } from "./VisualContext";
+import type { VisualContext } from "./VisualContext";
 
 // Singleton worker instance
 let worker: Worker | null = null;
-let isReady = false;
 
 // Create the worker
 function getWorker(): Worker {

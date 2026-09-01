@@ -164,7 +164,7 @@ export class PrivacyEngine {
       for (const red of visualWithRedactions.redactions) {
         findings.push({
           classification: "SENSITIVE",
-          category: red.category,
+          category: red.category as any,
           confidence: red.confidence,
           action: "REDACT",
           reason: "Visual Object/Text Pattern Match",

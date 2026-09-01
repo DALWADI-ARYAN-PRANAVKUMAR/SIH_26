@@ -50,24 +50,7 @@ function getStateIcon(state: AssistantState, style: AvatarStyle): string {
   }
 }
 
-/** Get inline background style for the avatar based on state and style. */
-function getAvatarBgColor(state: AssistantState, style: AvatarStyle): string {
-  // For custom/image avatars, use a neutral bg
-  if (style === "custom") return "#6366f1";
 
-  switch (state) {
-    case "LISTENING": return "#6366f1";
-    case "THINKING": return "#f59e0b";
-    case "EXECUTING": return "#3b82f6";
-    case "SUCCESS": return "#10b981";
-    case "ERROR": return "#ef4444";
-    case "IDLE":
-    default:
-      if (style === "robot") return "#1f2937";
-      if (style === "minimal") return "#111827";
-      return "#6366f1"; // classic
-  }
-}
 
 export const Avatar: React.FC = () => {
   const state = useAssistantStore((s) => s.state);
@@ -188,7 +171,6 @@ export const Avatar: React.FC = () => {
 
   if (!position) return null;
 
-  const bgColor = getAvatarBgColor(state, avatarPrefs.style);
   const isAnimating = state === "THINKING" || state === "LISTENING";
   const isSpinning = state === "EXECUTING";
 
