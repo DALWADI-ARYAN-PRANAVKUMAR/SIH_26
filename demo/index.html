@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Privacy Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 40px;
+            color: #1f2937;
+        }
+        h1 {
+            text-align: center;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            margin-bottom: 40px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+        }
+        .card h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        
+        /* Synthetic Images (Using CSS & Canvas to simulate images for local testing) */
+        .synthetic-image {
+            background-color: #fdf8f6;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: "Courier New", Courier, monospace;
+            text-align: center;
+            position: relative;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .synthetic-image::before {
+            content: "IMAGE CONTENT";
+            position: absolute;
+            top: 4px;
+            left: 8px;
+            font-size: 10px;
+            color: #94a3b8;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+
+        .highlight { font-weight: bold; color: #ef4444; font-size: 1.2rem; margin: 10px 0; }
+        .pan-card { background: #e0f2fe; border-color: #7dd3fc; }
+        .face-card { background: #fef3c7; border-color: #fcd34d; font-size: 4rem; }
+        
+        button.action-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+        button.action-btn:hover { background-color: #2563eb; }
+    </style>
+</head>
+<body>
+
+    <h1>Visual Privacy Test Environment</h1>
+    <p class="subtitle">Use the Browser Extension to analyze this page visually. The Agent should detect and locally redact the sensitive information shown below.</p>
+
+    <div class="grid">
+        <!-- 1. Synthetic Credit Card (Inside an Image) -->
+        <div class="card">
+            <h2>Payment Image (Credit Card)</h2>
+            <div class="synthetic-image">
+                <div style="text-align: left; width: 100%;">
+                    <div style="font-family: sans-serif; color: #64748b; margin-bottom: 8px;">GLOBAL BANK</div>
+                    <div class="highlight" style="letter-spacing: 2px;">4111 1111 1111 1111</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                        <span>JOHN DOE</span>
+                        <span>12/29</span>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Vision Agent detects CREDIT_CARD and redacts the number.</p>
+        </div>
+
+        <!-- 2. Synthetic PAN Card (Inside an Image) -->
+        <div class="card">
+            <h2>ID Document Image (PAN)</h2>
+            <div class="synthetic-image pan-card">
+                <div style="text-align: left; width: 100%;">
+                    <div style="font-family: sans-serif; font-size: 0.8rem; font-weight: bold; text-align: center; border-bottom: 1px solid #7dd3fc; margin-bottom: 10px; padding-bottom: 5px;">INCOME TAX DEPARTMENT</div>
+                    <div style="font-size: 0.8rem;">Name: KAVYA SHAH</div>
+                    <div class="highlight" style="font-size: 1.1rem; color: #0369a1;">ABCDE1234F</div>
+                </div>
+            </div>
+            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Vision Agent detects PAN and redacts it.</p>
+        </div>
+
+        <!-- 3. Visual Email & Phone -->
+        <div class="card">
+            <h2>Contact Card Image</h2>
+            <div class="synthetic-image">
+                <div>Contact Support</div>
+                <div class="highlight" style="font-size: 1rem; color: #10b981;">kavya.shah@example.com</div>
+                <div class="highlight" style="font-size: 1rem; color: #10b981;">+91 9876543210</div>
+            </div>
+            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Vision Agent detects EMAIL and PHONE.</p>
+        </div>
+
+        <!-- 4. Simulated Face -->
+        <div class="card">
+            <h2>Profile Photo Image</h2>
+            <div class="synthetic-image face-card">
+                🧑🏻‍🦱
+            </div>
+            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Vision Agent detects FACE and applies blur mask.</p>
+        </div>
+
+        <!-- 5. Public UI Element -->
+        <div class="card">
+            <h2>Standard Visual Target</h2>
+            <div style="text-align: center; padding: 30px 0;">
+                <button class="action-btn">Confirm Payment</button>
+            </div>
+            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Agent identifies this button via visual fusion without redacting it.</p>
+        </div>
+        
+        <!-- 6. Public UI Element -->
+        <div class="card">
+            <h2>Document Layout</h2>
+            <div style="text-align: left; font-family: serif; color: #444; border: 1px solid #ccc; padding: 15px; background: #fafafa;">
+                <h3 style="margin-top: 0;">Chapter 1</h3>
+                <p style="font-size: 0.9rem; line-height: 1.5;">This is a public document layout test. There is no sensitive information here, but the visual engine should be able to read and extract this block of text properly using OCR.</p>
+            </div>
+            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Normal OCR extraction, no redaction.</p>
+        </div>
+    </div>
+
+</body>
+</html>

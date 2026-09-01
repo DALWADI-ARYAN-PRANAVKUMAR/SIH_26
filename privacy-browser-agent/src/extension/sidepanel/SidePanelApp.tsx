@@ -10,6 +10,7 @@ const TABS = [
   { key: "chat" as const, label: "Chat" },
   { key: "activity" as const, label: "Activity" },
   { key: "privacy" as const, label: "Privacy" },
+  { key: "system" as const, label: "System" },
 ] as const;
 
 export const SidePanelApp: React.FC = () => {
@@ -90,9 +91,7 @@ export const SidePanelApp: React.FC = () => {
       )}
       {activeTab === "activity" && <ActivityPanel />}
       {activeTab === "privacy" && <StatusIndicator />}
-
-      {/* Floating System Metrics (Glassmorphism) */}
-      <SystemMetrics />
+      {activeTab === "system" && <SystemMetrics />}
     </div>
   );
 };

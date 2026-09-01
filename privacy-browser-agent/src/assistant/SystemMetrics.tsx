@@ -16,8 +16,8 @@ export const SystemMetrics: React.FC = () => {
   }, []);
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-50 pointer-events-none">
-      <div className="bg-white/20 dark:bg-black/20 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.12)] pointer-events-auto">
+    <div className="flex-1 p-4 overflow-y-auto">
+      <div className="bg-white/20 dark:bg-black/20 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
         <h3 className="text-xs font-semibold text-agent-text mb-3 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-agent-primary animate-pulse"></span>
           System Telemetry
