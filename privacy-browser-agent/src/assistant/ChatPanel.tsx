@@ -41,7 +41,7 @@ export const ChatPanel: React.FC = () => {
         // Simple slide-in animation
         animation: "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
       }}
-      className="flex flex-col bg-agent-bg border-l border-agent-surface-light shadow-2xl overflow-hidden"
+      className="flex flex-col bg-agent-bg shadow-neu overflow-hidden"
     >
       <style>{`
         @keyframes slideInRight {
@@ -51,7 +51,7 @@ export const ChatPanel: React.FC = () => {
       `}</style>
       
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-agent-surface border-b border-agent-surface-light">
+      <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-agent-text">
             ✦ Privacy Agent

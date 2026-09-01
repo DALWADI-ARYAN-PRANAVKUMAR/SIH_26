@@ -19,6 +19,12 @@ export default {
           warning: "var(--agent-warning)",
         },
       },
+      boxShadow: {
+        neu: '6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light)',
+        'neu-sm': '3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light)',
+        'neu-inset': 'inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light)',
+        'neu-inset-sm': 'inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light)',
+      },
       animation: {
         "pulse-slow": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "spin-slow": "spin 2s linear infinite",

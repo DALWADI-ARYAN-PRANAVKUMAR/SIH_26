@@ -23,7 +23,7 @@ export const SidePanelApp: React.FC = () => {
   return (
     <div className="absolute inset-0 flex flex-col bg-agent-bg overflow-hidden text-agent-text">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-agent-surface backdrop-blur-md border-b border-agent-surface-light">
+      <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-agent-text">
             🛡️ Privacy Agent
@@ -64,15 +64,15 @@ export const SidePanelApp: React.FC = () => {
       </div>
 
       {/* Tab bar */}
-      <div className="flex border-b border-agent-surface-light">
+      <div className="flex gap-2 px-4 py-2">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 py-2 text-xs font-medium transition-colors ${
+            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all duration-200 ${
               activeTab === tab.key
-                ? "text-agent-primary border-b-2 border-agent-primary bg-agent-primary/5"
-                : "text-agent-text-muted hover:text-agent-text hover:bg-agent-surface/50"
+                ? "text-agent-primary shadow-neu-inset bg-agent-bg"
+                : "text-agent-text-muted hover:text-agent-text shadow-neu bg-agent-bg"
             }`}
           >
             {tab.label}

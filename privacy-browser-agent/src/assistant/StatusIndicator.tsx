@@ -7,7 +7,7 @@ export const StatusIndicator: React.FC = () => {
   return (
     <div className="flex-1 overflow-y-auto px-4 py-3">
       {/* Privacy Dashboard */}
-      <div className="bg-agent-surface border border-agent-surface-light rounded-xl p-4 mb-3 shadow-sm">
+      <div className="bg-agent-bg rounded-xl p-4 mb-5 shadow-neu">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-lg">🔒</span>
           <h3 className="text-agent-text font-semibold text-sm">

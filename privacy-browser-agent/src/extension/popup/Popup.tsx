@@ -58,7 +58,7 @@ export const Popup: React.FC = () => {
       </div>
 
       {/* Status */}
-      <div className="bg-agent-surface rounded-xl p-4 mb-4">
+      <div className="bg-agent-bg shadow-neu rounded-xl p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-agent-text text-xs font-medium">Status</span>
           <span
@@ -75,10 +75,10 @@ export const Popup: React.FC = () => {
         {/* Toggle */}
         <button
           onClick={handleToggle}
-          className={`w-full py-2.5 rounded-lg text-xs font-medium transition-colors ${
+          className={`w-full py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 mt-2 ${
             enabled
-              ? "bg-agent-error/20 text-agent-error hover:bg-agent-error/30"
-              : "bg-agent-primary text-white hover:bg-agent-primary-hover"
+              ? "bg-agent-bg shadow-neu-inset text-agent-error"
+              : "bg-agent-primary text-white shadow-neu hover:shadow-neu-inset"
           }`}
         >
           {enabled ? "Disable Assistant" : "Enable Assistant"}

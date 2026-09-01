@@ -33,7 +33,7 @@ export const InputBox: React.FC = () => {
   );
 
   return (
-    <div className="flex items-center gap-2 p-3 border-t border-agent-surface-light bg-agent-surface/80 backdrop-blur-md">
+    <div className="flex items-center gap-2 p-4">
       <input
         ref={inputRef}
         type="text"
@@ -42,12 +42,12 @@ export const InputBox: React.FC = () => {
         onKeyDown={handleKeyDown}
         placeholder={isProcessing ? "Processing..." : "Type '/do' for actions, or chat..."}
         disabled={isProcessing}
-        className="flex-1 bg-agent-surface border border-agent-surface-light rounded-lg px-3 py-2 text-sm text-agent-text placeholder-agent-text-muted outline-none focus:border-agent-primary focus:ring-1 focus:ring-agent-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex-1 bg-agent-bg shadow-neu-inset rounded-lg px-3 py-2 text-sm text-agent-text placeholder-agent-text-muted outline-none disabled:opacity-50 disabled:cursor-not-allowed"
       />
       <button
         onClick={handleSend}
         disabled={!text.trim() || isProcessing}
-        className="bg-agent-primary hover:bg-agent-primary-hover disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150"
+        className="bg-agent-primary disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 shadow-neu active:shadow-neu-inset"
       >
         Send
       </button>

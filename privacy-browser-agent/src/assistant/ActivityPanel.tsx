@@ -45,7 +45,7 @@ export const ActivityPanel: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header with clear button */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-agent-surface-light">
+      <div className="flex items-center justify-between px-4 py-3">
         <span className="text-agent-text-muted text-xs font-medium">
           Pipeline Activity
         </span>

@@ -20,10 +20,10 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
       <div
         className={`max-w-[80%] rounded-xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words ${
           isUser
-            ? "bg-agent-primary text-white rounded-br-sm shadow-sm"
+            ? "bg-agent-bg text-agent-primary rounded-br-sm shadow-neu-inset"
             : isSystem
-              ? "bg-agent-error/20 text-agent-error border border-agent-error/30 rounded-bl-sm backdrop-blur-md"
-              : "bg-agent-surface text-agent-text rounded-bl-sm border border-white/20 dark:border-white/10 backdrop-blur-md shadow-sm"
+              ? "bg-agent-bg text-agent-error rounded-bl-sm shadow-neu border border-agent-error/50"
+              : "bg-agent-bg text-agent-text rounded-bl-sm shadow-neu"
         }`}
       >
         {message.content}
@@ -66,13 +66,13 @@ export const MessageList: React.FC = () => {
     >
       {/* --- Phase 3 Task Dashboard --- */}
       {activeTask && (
-        <div className="bg-agent-surface border border-agent-surface-light rounded-xl p-4 shadow-sm mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold text-agent-text text-sm">✨ Browser Agent Task</h3>
+        <div className="bg-agent-bg shadow-neu rounded-xl p-4 mb-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-agent-text text-sm">✦ Browser Agent Task</h3>
             {(taskState !== "IDLE" && taskState !== "COMPLETED" && taskState !== "CANCELLED" && taskState !== "FAILED") && (
               <button 
                 onClick={stopTask}
-                className="text-xs bg-red-500/10 text-red-500 px-2 py-1 rounded hover:bg-red-500/20"
+                className="text-xs bg-agent-bg shadow-neu active:shadow-neu-inset text-agent-error font-medium px-3 py-1.5 rounded-lg"
               >
                 Stop Agent
               </button>
