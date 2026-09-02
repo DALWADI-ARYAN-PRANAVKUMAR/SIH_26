@@ -54,7 +54,7 @@ export async function startAgentTask(taskPrompt: string) {
 
       if (!pageContext) {
         if (perception.url?.startsWith("file://")) {
-          throw new Error("Cannot read local files. Please go to chrome://extensions, find Privacy Browser Agent, click Details, and enable 'Allow access to file URLs'.");
+          throw new Error("Cannot read this local file. Please ensure 'Allow access to file URLs' is enabled in chrome://extensions and then refresh this page.");
         } else if (perception.url?.startsWith("chrome://")) {
           throw new Error("Chrome extensions are not allowed to read chrome:// pages for security reasons.");
         }
