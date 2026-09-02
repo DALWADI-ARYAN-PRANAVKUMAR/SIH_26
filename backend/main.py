@@ -113,18 +113,27 @@ async def chat_endpoint(request: ChatRequest):
             "data": b64_str
         })
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=contents,
-        )
-        return ChatResponse(reply=response.text, confidence=0.9)
-    except Exception as e:
-        print(f"Error calling LLM: {e}")
-        return ChatResponse(
-            reply=f"⚠️ Sorry, I encountered an error communicating with the AI model: {str(e)}",
-            confidence=0.0
-        )
+    import time
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=contents,
+            )
+            return ChatResponse(reply=response.text, confidence=0.9)
+        except Exception as e:
+            error_msg = str(e)
+            if "503" in error_msg and attempt < max_retries - 1:
+                print(f"Model overloaded (503). Retrying in {2 ** attempt} seconds...")
+                time.sleep(2 ** attempt)
+                continue
+            
+            print(f"Error calling LLM: {e}")
+            return ChatResponse(
+                reply=f"😭 Sorry, I encountered an error communicating with the AI model: {error_msg}",
+                confidence=0.0
+            )
 
 import json
 
@@ -193,29 +202,38 @@ async def plan_endpoint(request: PlanRequest):
             "data": b64_str
         })
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=contents,
-        )
-        
-        # Parse JSON from response
-        # Gemini might wrap in ```json ... ```
-        text = response.text.strip()
-        if text.startswith("```json"):
-            text = text[7:-3].strip()
-        elif text.startswith("```"):
-            text = text[3:-3].strip()
+    import time
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.6-flash",
+                contents=contents,
+            )
             
-        data = json.loads(text)
-        return ActionPlan(**data)
-    except Exception as e:
-        print(f"Error calling LLM for plan: {e}")
-        return ActionPlan(
-            message=f"I encountered an error while planning: {str(e)}",
-            actions=[],
-            requiresConfirmation=False
-        )
+            # Parse JSON from response
+            # Gemini might wrap in ```json ... ```
+            text = response.text.strip()
+            if text.startswith("```json"):
+                text = text[7:-3].strip()
+            elif text.startswith("```"):
+                text = text[3:-3].strip()
+                
+            data = json.loads(text)
+            return ActionPlan(**data)
+        except Exception as e:
+            error_msg = str(e)
+            if "503" in error_msg and attempt < max_retries - 1:
+                print(f"Model overloaded (503) for plan. Retrying in {2 ** attempt} seconds...")
+                time.sleep(2 ** attempt)
+                continue
+                
+            print(f"Error calling LLM for plan: {e}")
+            return ActionPlan(
+                message=f"I encountered an error while planning: {error_msg}",
+                actions=[],
+                requiresConfirmation=False
+            )
 
 if __name__ == "__main__":
     import uvicorn
