@@ -115,7 +115,7 @@ async def chat_endpoint(request: ChatRequest):
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             contents=contents,
         )
         return ChatResponse(reply=response.text, confidence=0.9)
@@ -195,7 +195,7 @@ async def plan_endpoint(request: PlanRequest):
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             contents=contents,
         )
         
