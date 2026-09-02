@@ -118,7 +118,7 @@ async def chat_endpoint(request: ChatRequest):
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model="gemini-3.6-flash",
+                model="gemini-1.5-flash",
                 contents=contents,
             )
             return ChatResponse(reply=response.text, confidence=0.9)
@@ -207,7 +207,7 @@ async def plan_endpoint(request: PlanRequest):
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model="gemini-3.6-flash",
+                model="gemini-1.5-flash",
                 contents=contents,
             )
             
