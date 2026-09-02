@@ -53,7 +53,12 @@ export async function startAgentTask(taskPrompt: string) {
       const pageContext = perception.pageContext;
 
       if (!pageContext) {
-        throw new Error("Could not extract page context.");
+        if (perception.url?.startsWith("file://")) {
+          throw new Error("Cannot read local files. Please go to chrome://extensions, find Privacy Browser Agent, click Details, and enable 'Allow access to file URLs'.");
+        } else if (perception.url?.startsWith("chrome://")) {
+          throw new Error("Chrome extensions are not allowed to read chrome:// pages for security reasons.");
+        }
+        throw new Error("Could not extract page context. Please try reloading the page.");
       }
 
       store.setTaskState("PLANNING");
