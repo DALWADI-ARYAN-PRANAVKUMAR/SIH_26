@@ -69,12 +69,20 @@ export const MessageList: React.FC = () => {
         <div className="bg-agent-bg shadow-neu rounded-xl p-4 mb-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-agent-text text-sm">✦ Browser Agent Task</h3>
-            {(taskState !== "IDLE" && taskState !== "COMPLETED" && taskState !== "CANCELLED" && taskState !== "FAILED") && (
+            {(taskState !== "IDLE" && taskState !== "COMPLETED" && taskState !== "CANCELLED" && taskState !== "FAILED") ? (
               <button 
                 onClick={stopTask}
                 className="text-xs bg-agent-bg shadow-neu active:shadow-neu-inset text-agent-error font-medium px-3 py-1.5 rounded-lg"
               >
                 Stop Agent
+              </button>
+            ) : (
+              <button 
+                onClick={() => useAssistantStore.getState().cancelTask()}
+                className="text-xs bg-agent-bg shadow-neu active:shadow-neu-inset text-agent-text-muted hover:text-agent-text font-medium px-2 py-1 rounded-lg"
+                title="Dismiss task"
+              >
+                ✕ Clear
               </button>
             )}
           </div>

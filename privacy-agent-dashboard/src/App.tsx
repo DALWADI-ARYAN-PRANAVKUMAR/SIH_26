@@ -207,26 +207,22 @@ function App() {
       setStatusMessage('Please enter your Extension ID first.');
       return;
     }
-    if (!window.chrome || !chrome.runtime) {
+    const win = window as any;
+    if (!win.chrome || !win.chrome.runtime) {
       setStatus('error');
       setStatusMessage('Chrome extension API not available.');
       return;
     }
-    chrome.runtime.sendMessage(extensionId, payload, (response) => {
-      if (chrome.runtime.lastError) {
+    win.chrome.runtime.sendMessage(extensionId, payload, (response: any) => {
+      if (win.chrome.runtime.lastError) {
         setStatus('error');
-        setStatusMessage(`Error: ${chrome.runtime.lastError.message}`);
+        setStatusMessage(`Error: ${win.chrome.runtime.lastError.message}`);
       } else if (response?.success) {
         setStatus('success');
         setStatusMessage('✓ Synced!');
         setTimeout(() => setStatus('idle'), 2000);
       }
     });
-  };
-
-  const handleStyleChange = (style: string, image: string | null = null) => {
-    setSelectedAvatar(style);
-    sendToExtension({ type: 'SET_AVATAR_PREFS', payload: { style: 'custom', image } });
   };
 
   const handleBuiltinStyle = (style: 'classic' | 'robot' | 'minimal') => {

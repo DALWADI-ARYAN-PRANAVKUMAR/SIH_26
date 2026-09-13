@@ -5,11 +5,13 @@ import { InputBox } from "@/assistant/InputBox";
 import { StatusIndicator } from "@/assistant/StatusIndicator";
 import { ActivityPanel } from "@/assistant/ActivityPanel";
 import { SystemMetrics } from "@/assistant/SystemMetrics";
+import { VaultPanel } from "@/assistant/VaultPanel";
 
 const TABS = [
   { key: "chat" as const, label: "Chat" },
-  { key: "activity" as const, label: "Activity" },
+  { key: "vault" as const, label: "Vault" },
   { key: "privacy" as const, label: "Privacy" },
+  { key: "activity" as const, label: "Activity" },
   { key: "system" as const, label: "System" },
 ] as const;
 
@@ -78,8 +80,9 @@ export const SidePanelApp: React.FC = () => {
           <InputBox />
         </>
       )}
-      {activeTab === "activity" && <ActivityPanel />}
+      {activeTab === "vault" && <VaultPanel />}
       {activeTab === "privacy" && <StatusIndicator />}
+      {activeTab === "activity" && <ActivityPanel />}
       {activeTab === "system" && <SystemMetrics />}
     </div>
   );

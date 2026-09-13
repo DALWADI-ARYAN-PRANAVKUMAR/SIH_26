@@ -17,9 +17,12 @@ export async function perceivePage(userMessage?: string): Promise<PerceptionResu
     throw new Error("Cannot perceive page: Chrome tabs API unavailable");
   }
 
-  // 1. Get the active tab in the current window
-  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-  const activeTab = tabs[0];
+  // 1. Get the active tab in the current or last focused window (needed for Side Panel)
+  let tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tabs || tabs.length === 0) {
+    tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  }
+  const activeTab = tabs?.[0];
   
   if (!activeTab || !activeTab.id) {
     throw new Error("No active tab found to perceive.");

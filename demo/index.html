@@ -3,164 +3,459 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Privacy Test Page</title>
+    <title>Privacy Agent – Interactive Visual Privacy Testbench</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f3f4f6;
-            margin: 0;
-            padding: 40px;
-            color: #1f2937;
-        }
-        h1 {
-            text-align: center;
-            color: #111827;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #4b5563;
-            margin-bottom: 40px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e5e7eb;
-        }
-        .card h2 {
-            font-size: 1.1rem;
-            margin-top: 0;
-            margin-bottom: 16px;
-            color: #374151;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 8px;
-        }
-        
-        /* Synthetic Images (Using CSS & Canvas to simulate images for local testing) */
-        .synthetic-image {
-            background-color: #fdf8f6;
-            border: 2px dashed #cbd5e1;
-            border-radius: 8px;
-            padding: 20px;
-            font-family: "Courier New", Courier, monospace;
-            text-align: center;
-            position: relative;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .synthetic-image::before {
-            content: "IMAGE CONTENT";
-            position: absolute;
-            top: 4px;
-            left: 8px;
-            font-size: 10px;
-            color: #94a3b8;
-            font-family: sans-serif;
-            font-weight: bold;
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.2);
+            --danger: #f87171;
+            --danger-bg: rgba(248, 113, 113, 0.1);
+            --success: #34d399;
+            --success-bg: rgba(52, 211, 153, 0.1);
+            --warning: #fbbf24;
         }
 
-        .highlight { font-weight: bold; color: #ef4444; font-size: 1.2rem; margin: 10px 0; }
-        .pan-card { background: #e0f2fe; border-color: #7dd3fc; }
-        .face-card { background: #fef3c7; border-color: #fcd34d; font-size: 4rem; }
-        
-        button.action-btn {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            width: 100%;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        button.action-btn:hover { background-color: #2563eb; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            color: var(--text-main);
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--primary-glow);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1140px;
+            margin: 0 auto 50px auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: #475569;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .tag-danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        .tag-success {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        /* Mock ID / Card elements */
+        .mock-doc {
+            border-radius: 12px;
+            padding: 18px;
+            font-family: 'Courier New', Courier, monospace;
+            position: relative;
+            background: #090d16;
+            border: 1px solid #1e293b;
+        }
+
+        /* Credit Card Mockup */
+        .credit-card-mock {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            border: 1px solid #3b82f6;
+            color: white;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-chip {
+            width: 38px;
+            height: 28px;
+            background: linear-gradient(135deg, #fcd34d 0%, #b45309 100%);
+            border-radius: 4px;
+            margin-bottom: 14px;
+        }
+
+        .card-digits {
+            font-size: 1.25rem;
+            letter-spacing: 3px;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 12px;
+        }
+
+        /* Aadhaar Mockup */
+        .aadhaar-mock {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            color: #1c1917;
+            border: 2px solid #fdba74;
+        }
+
+        .aadhaar-header {
+            font-family: sans-serif;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #ea580c;
+            text-align: center;
+            border-bottom: 2px solid #ea580c;
+            padding-bottom: 4px;
+            margin-bottom: 10px;
+        }
+
+        .aadhaar-digits {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #9a3412;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        /* PAN Card Mockup */
+        .pan-mock {
+            background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+            color: #164e63;
+            border: 2px solid #67e8f9;
+        }
+
+        .pan-header {
+            font-family: sans-serif;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-align: center;
+            color: #0e7490;
+            border-bottom: 1px solid #a5f3fc;
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+        }
+
+        .pan-digits {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #0891b2;
+            margin: 6px 0;
+        }
+
+        /* UPI Mockup */
+        .upi-mock {
+            background: #182234;
+            border: 1px dashed #38bdf8;
+            color: #f8fafc;
+            text-align: center;
+        }
+
+        .upi-id {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #38bdf8;
+            margin: 8px 0;
+        }
+
+        /* Secret Key Mockup */
+        .key-mock {
+            background: #111827;
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            word-break: break-all;
+            font-size: 0.85rem;
+        }
+
+        .expected {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 14px;
+            line-height: 1.4;
+        }
+
+        .expected strong {
+            color: #cbd5e1;
+        }
+
+        .face-avatar {
+            font-size: 4rem;
+            text-align: center;
+            display: block;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Visual Privacy Test Environment</h1>
-    <p class="subtitle">Use the Browser Extension to analyze this page visually. The Agent should detect and locally redact the sensitive information shown below.</p>
+    <div class="header">
+        <div class="badge">🛡️ SIH26171 – Local Privacy Engine</div>
+        <h1>Visual & DOM Privacy Testbench</h1>
+        <p class="subtitle">
+            An interactive sandbox populated with realistic personal, financial, and Indian national IDs.
+            Use the <strong>Privacy Agent Side Panel</strong> or the floating on-page assistant to observe 100% on-device perception and local data redaction.
+        </p>
 
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-num">8+</div>
+                <div class="stat-label">PII Classifiers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">0 ms</div>
+                <div class="stat-label">Server Exposure</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">100%</div>
+                <div class="stat-label">Client-Side Masking</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PII Detection Cards Grid -->
     <div class="grid">
-        <!-- 1. Synthetic Credit Card (Inside an Image) -->
+        <!-- 1. Credit Card -->
         <div class="card">
-            <h2>Payment Image (Credit Card)</h2>
-            <div class="synthetic-image">
-                <div style="text-align: left; width: 100%;">
-                    <div style="font-family: sans-serif; color: #64748b; margin-bottom: 8px;">GLOBAL BANK</div>
-                    <div class="highlight" style="letter-spacing: 2px;">4111 1111 1111 1111</div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
-                        <span>JOHN DOE</span>
-                        <span>12/29</span>
-                    </div>
+            <div class="card-header">
+                <span class="card-title">Payment Card</span>
+                <span class="tag tag-danger">CREDIT_CARD</span>
+            </div>
+            <div class="mock-doc credit-card-mock">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">GLOBAL PLATINUM</span>
+                    <span style="font-size: 0.9rem; font-weight: bold;">VISA</span>
+                </div>
+                <div class="card-chip"></div>
+                <div class="card-digits">4532 8901 2345 6789</div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                    <span>CARDHOLDER: ARYAN D.</span>
+                    <span>EXP: 08/29</span>
                 </div>
             </div>
-            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Vision Agent detects CREDIT_CARD and redacts the number.</p>
+            <div class="expected">
+                <strong>Expected:</strong> Redacted to <code>[CREDIT_CARD]</code> locally before any LLM transmission.
+            </div>
         </div>
 
-        <!-- 2. Synthetic PAN Card (Inside an Image) -->
+        <!-- 2. Aadhaar Card (Indian National ID) -->
         <div class="card">
-            <h2>ID Document Image (PAN)</h2>
-            <div class="synthetic-image pan-card">
-                <div style="text-align: left; width: 100%;">
-                    <div style="font-family: sans-serif; font-size: 0.8rem; font-weight: bold; text-align: center; border-bottom: 1px solid #7dd3fc; margin-bottom: 10px; padding-bottom: 5px;">INCOME TAX DEPARTMENT</div>
-                    <div style="font-size: 0.8rem;">Name: KAVYA SHAH</div>
-                    <div class="highlight" style="font-size: 1.1rem; color: #0369a1;">ABCDE1234F</div>
+            <div class="card-header">
+                <span class="card-title">Aadhaar Card</span>
+                <span class="tag tag-danger">AADHAAR</span>
+            </div>
+            <div class="mock-doc aadhaar-mock">
+                <div class="aadhaar-header">GOVERNMENT OF INDIA • UNIQUE IDENTIFICATION AUTHORITY</div>
+                <div style="font-size: 0.8rem; font-weight: bold;">Name: Aryan Dalwadi</div>
+                <div style="font-size: 0.75rem; color: #78350f;">DOB: 15/08/2003 | Gender: Male</div>
+                <div class="aadhaar-digits">5482 9103 4721</div>
+                <div style="font-size: 0.7rem; text-align: center; color: #9a3412;">Mera Aadhaar, Meri Pehchan</div>
+            </div>
+            <div class="expected">
+                <strong>Expected:</strong> 12-digit Indian Aadhaar recognized and masked to <code>[AADHAAR]</code>.
+            </div>
+        </div>
+
+        <!-- 3. PAN Card (Permanent Account Number) -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Income Tax PAN</span>
+                <span class="tag tag-danger">PAN</span>
+            </div>
+            <div class="mock-doc pan-mock">
+                <div class="pan-header">INCOME TAX DEPARTMENT • GOVT. OF INDIA</div>
+                <div style="font-size: 0.8rem; font-weight: bold;">Name: ARYAN DALWADI</div>
+                <div class="pan-digits">ABCDE1234F</div>
+                <div style="font-size: 0.7rem; color: #0891b2;">Permanent Account Number Card</div>
+            </div>
+            <div class="expected">
+                <strong>Expected:</strong> 10-char alphanumeric Indian Tax ID redacted to <code>[PAN]</code>.
+            </div>
+        </div>
+
+        <!-- 4. UPI & Banking Info -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">UPI VPA & Bank IFSC</span>
+                <span class="tag tag-danger">UPI / IFSC</span>
+            </div>
+            <div class="mock-doc upi-mock">
+                <div style="font-size: 0.8rem; color: #94a3b8;">Instant UPI Payment ID:</div>
+                <div class="upi-id">aryan.pay@okhdfcbank</div>
+                <div style="font-size: 0.8rem; border-top: 1px solid #334155; padding-top: 8px; margin-top: 8px;">
+                    <div>Bank: HDFC Bank Mumbai</div>
+                    <div>IFSC: <strong style="color: #38bdf8;">HDFC0001234</strong></div>
                 </div>
             </div>
-            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Vision Agent detects PAN and redacts it.</p>
+            <div class="expected">
+                <strong>Expected:</strong> UPI VPA identifier and bank branch IFSC code parsed and sanitized.
+            </div>
         </div>
 
-        <!-- 3. Visual Email & Phone -->
+        <!-- 5. Contact Info (Email & Phone) -->
         <div class="card">
-            <h2>Contact Card Image</h2>
-            <div class="synthetic-image">
-                <div>Contact Support</div>
-                <div class="highlight" style="font-size: 1rem; color: #10b981;">kavya.shah@example.com</div>
-                <div class="highlight" style="font-size: 1rem; color: #10b981;">+91 9876543210</div>
+            <div class="card-header">
+                <span class="card-title">Personal Contacts</span>
+                <span class="tag tag-danger">EMAIL / PHONE</span>
             </div>
-            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Vision Agent detects EMAIL and PHONE.</p>
+            <div class="mock-doc" style="background: #131d2e; border-color: #1e3a8a;">
+                <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Contact Details:</div>
+                <div style="color: #34d399; font-weight: bold; margin-bottom: 4px;">aryan.test@gmail.com</div>
+                <div style="color: #34d399; font-weight: bold;">+91 9876543210</div>
+                <div style="color: #64748b; font-size: 0.75rem; margin-top: 8px;">Secondary: contact.aryan@sih2026.gov.in</div>
+            </div>
+            <div class="expected">
+                <strong>Expected:</strong> Email addresses and Indian mobile numbers (+91) replaced with placeholders.
+            </div>
         </div>
 
-        <!-- 4. Simulated Face -->
+        <!-- 6. Developer Secret & Token -->
         <div class="card">
-            <h2>Profile Photo Image</h2>
-            <div class="synthetic-image face-card">
-                🧑🏻‍🦱
+            <div class="card-header">
+                <span class="card-title">API Key & Auth Token</span>
+                <span class="tag tag-danger">API_KEY / OTP</span>
             </div>
-            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Vision Agent detects FACE and applies blur mask.</p>
+            <div class="mock-doc key-mock">
+                <div style="font-weight: bold; margin-bottom: 4px;">API Secret:</div>
+                <div>sk-live-94819283749102938475829103948572</div>
+                <div style="margin-top: 8px; font-weight: bold;">2FA Verification Code:</div>
+                <div style="font-size: 1.1rem; color: #fbbf24; letter-spacing: 2px;">849201</div>
+            </div>
+            <div class="expected">
+                <strong>Expected:</strong> High-risk production API keys and OTPs caught by entropy/heuristic regex.
+            </div>
         </div>
 
-        <!-- 5. Public UI Element -->
+        <!-- 7. Biometric / Profile Face -->
         <div class="card">
-            <h2>Standard Visual Target</h2>
-            <div style="text-align: center; padding: 30px 0;">
-                <button class="action-btn">Confirm Payment</button>
+            <div class="card-header">
+                <span class="card-title">Profile Photo / Avatar</span>
+                <span class="tag tag-danger">FACE</span>
             </div>
-            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Agent identifies this button via visual fusion without redacting it.</p>
+            <div class="mock-doc" style="background: #1e1b4b; border-color: #4338ca; text-align: center;">
+                <span class="face-avatar">🧑🏽‍💻</span>
+                <div style="font-size: 0.8rem; color: #a5b4fc;">Biometric User Portrait</div>
+            </div>
+            <div class="expected">
+                <strong>Expected:</strong> Vision Engine applies pixelated blur mask over detected face bounds.
+            </div>
         </div>
-        
-        <!-- 6. Public UI Element -->
+
+        <!-- 8. Public Content (Safe / Non-Sensitive) -->
         <div class="card">
-            <h2>Document Layout</h2>
-            <div style="text-align: left; font-family: serif; color: #444; border: 1px solid #ccc; padding: 15px; background: #fafafa;">
-                <h3 style="margin-top: 0;">Chapter 1</h3>
-                <p style="font-size: 0.9rem; line-height: 1.5;">This is a public document layout test. There is no sensitive information here, but the visual engine should be able to read and extract this block of text properly using OCR.</p>
+            <div class="card-header">
+                <span class="card-title">Public Documentation</span>
+                <span class="tag tag-success">SAFE PUBLIC</span>
             </div>
-            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">Expected: Normal OCR extraction, no redaction.</p>
+            <div class="mock-doc" style="background: #0f172a; border-color: #334155; font-family: sans-serif;">
+                <div style="font-weight: bold; color: #38bdf8; margin-bottom: 4px;">Smart India Hackathon 2026</div>
+                <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.4;">
+                    Lightweight On-Device Visual Perception and Privacy Shielding for Autonomous Web Agents.
+                </p>
+            </div>
+            <div class="expected">
+                <strong>Expected:</strong> Non-sensitive public text remains unredacted for accurate AI reasoning.
+            </div>
         </div>
     </div>
 

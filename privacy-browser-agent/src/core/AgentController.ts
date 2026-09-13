@@ -76,11 +76,60 @@ export async function startAgentTask(taskPrompt: string) {
         logStep(`Privacy Scan: 🔒 Protected. Redacted ${pData.elementsRedacted} sensitive elements.`);
       }
 
-      logStep("Requesting action plan from backend...");
-      
-      const plan = await fetchActionPlan(taskPrompt, sanitizedContext);
+      let plan: AgentPlan;
+      const {
+        isAutofillIntent,
+        isExtractIntent,
+        loadProfileVault,
+        saveProfileVault,
+        generateVaultAutofillPlan,
+        extractProfileFromPageText,
+      } = await import("@/vault/ProfileVault");
+
+      if (isExtractIntent(taskPrompt)) {
+        logStep("Scanning page to extract profile details...");
+        const rawText = pageContext.text.join("\n");
+        const extracted = extractProfileFromPageText(rawText);
+        const count = Object.keys(extracted).length;
+        if (count > 0) {
+          await saveProfileVault(extracted);
+          store.setTaskState("COMPLETED");
+          logStep(`🔒 Extracted ${count} fields (${Object.keys(extracted).join(", ")}) and saved to your local Vault!`);
+          return;
+        } else {
+          store.setTaskState("COMPLETED");
+          logStep("No personal fields detected on this page to import.");
+          return;
+        }
+      }
+
+      const isAutofill = isAutofillIntent(taskPrompt);
+      let isLocalAction = false;
+
+      if (isAutofill) {
+        logStep("🔒 Accessing on-device Profile Vault...");
+        const vault = await loadProfileVault();
+        plan = generateVaultAutofillPlan(pageContext, vault);
+        logStep(`On-device Planner: ${plan.message}`);
+      } else {
+        const { parseLocalCommand } = await import("./LocalCommandParser");
+        const localPlan = parseLocalCommand(taskPrompt, pageContext);
+        if (localPlan) {
+          isLocalAction = true;
+          plan = localPlan;
+          logStep(`⚡ ${localPlan.message}`);
+        } else {
+          logStep("Requesting action plan from backend...");
+          plan = await fetchActionPlan(taskPrompt, sanitizedContext);
+        }
+      }
       
       if (!plan || plan.actions.length === 0) {
+        if (plan?.message && (plan.message.toLowerCase().includes("error") || plan.message.includes("429"))) {
+          store.setTaskState("FAILED");
+          logStep(plan.message, true);
+          return;
+        }
         store.setTaskState("COMPLETED");
         logStep("Task completed or no further actions required.");
         return;
@@ -95,6 +144,12 @@ export async function startAgentTask(taskPrompt: string) {
       }
 
       await executePlan(plan);
+
+      if (isAutofill || isLocalAction) {
+        store.setTaskState("COMPLETED");
+        logStep(isLocalAction ? "⚡ On-device action completed successfully." : "Form autofilled successfully from on-device vault.");
+        return;
+      }
       
       // If executePlan succeeds without throwing, we loop to observe and plan again
       stepCount++;

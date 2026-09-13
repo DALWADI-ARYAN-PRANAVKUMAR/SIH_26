@@ -296,8 +296,8 @@ export interface AssistantStoreState {
   setPanel: (open: boolean) => void;
 
   // Active tab
-  activeTab: "chat" | "activity" | "privacy" | "system";
-  setActiveTab: (tab: "chat" | "activity" | "privacy" | "system") => void;
+  activeTab: "chat" | "activity" | "privacy" | "system" | "vault";
+  setActiveTab: (tab: "chat" | "activity" | "privacy" | "system" | "vault") => void;
 
   // System Metrics
   systemMetrics: {

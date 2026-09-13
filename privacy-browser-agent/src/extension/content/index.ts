@@ -103,8 +103,14 @@ async function init(): Promise<void> {
         sendResponse({ success: true });
       }
       if (message.type === "GET_PAGE_CONTEXT") {
-        const context = getCurrentPageContext();
-        sendResponse({ success: true, context });
+        try {
+          const context = getCurrentPageContext();
+          sendResponse({ success: true, context });
+        } catch (err: any) {
+          console.error("[Privacy Agent] Error getting page context:", err);
+          sendResponse({ success: false, error: err?.message || String(err) });
+        }
+        return true;
       }
       if (message.type === "EXECUTE_ACTION" && message.payload) {
         // Execute action

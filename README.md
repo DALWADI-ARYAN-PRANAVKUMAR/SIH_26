@@ -36,6 +36,11 @@ By performing DOM extraction and strict privacy redaction purely on the client s
   - **Indian PII Support:** Aadhaar, PAN, UPI, IFSC.
   - Semantic placeholder replacement (e.g., `john@example.com` becomes `[EMAIL]`).
   - Real-time Privacy Audit Dashboard in the Side Panel.
+- **Phase 5: Local Privacy Vault & On-Device Action Engine** — Complete ✅
+  - Persistent, client-only profile storage via `chrome.storage.local`.
+  - Zero-cloud profile autofill: maps stored credentials directly into active form fields on-device.
+  - One-click profile extraction from active web pages.
+  - Hybrid On-Device Action Engine (`LocalCommandParser`): instant execution for deterministic commands (`type`, `click`, `select`, `scroll`), preventing cloud API rate limits (`429`) and eliminating sensitive data leakage.
 
 ---
 
@@ -127,6 +132,72 @@ The backend requires an LLM API key (Google Gemini) to generate action plans.
 3. Click **"Load unpacked"** in the top left.
 4. Select the `privacy-browser-agent/dist` folder.
 5. *Tip: Pin the "Privacy Browser Agent" icon to your Chrome toolbar for easy access!*
+
+---
+
+## 🔐 On-Device Privacy Vault (Local Profile Memory)
+
+The **Privacy Vault** allows the agent to remember your personal credentials (e.g., name, Aadhaar, PAN, card details, phone, email) so you don't have to re-type them into forms repeatedly.
+
+> [!IMPORTANT]
+> **Zero Cloud Exfiltration:** Vault data is stored **100% locally** in Chrome's sandboxed `chrome.storage.local`. It is **never** sent to the AI backend, **never** synced to any remote server, and **never** leaves your browser sandbox.
+
+### How to Add Data to the Vault
+
+There are three ways to manage your vault credentials:
+
+#### Method 1: Manual Entry via Side Panel UI (Recommended)
+1. Open the **Side Panel** in Chrome (click the extension icon in your toolbar).
+2. Click the **Vault** tab (with the lock icon 🔒) at the top.
+3. Type your personal details into the corresponding fields:
+   - **Full Name** (e.g., `Aryan Dalwadi`)
+   - **Email Address** (e.g., `aryan@example.com`)
+   - **Phone Number** (e.g., `+91 9876543210`)
+   - **Aadhaar Number** (e.g., `1234 5678 9012`)
+   - **PAN Card** (e.g., `ABCDE1234F`)
+   - **Cardholder Name** (e.g., `Aryan D.`)
+   - **Card Number & CVV & Expiry**
+   - **Street Address**
+4. Click **"Save to Local Vault"**. You will see a confirmation badge confirming the data is safely stored on-device.
+
+#### Method 2: One-Click Extraction from Current Web Page
+If you already have a profile page, mock KYC, or credentials page open (e.g., `demo/index.html`):
+1. Navigate to the page in Chrome.
+2. Open the **Vault** tab in the Side Panel.
+3. Click the **"Import from Page"** button.
+4. The perception engine parses the page DOM, automatically maps detected fields (Name, Aadhaar, PAN, Card), and updates your vault immediately.
+
+#### Method 3: Natural Language Prompt
+In the Assistant **Chat** tab, simply prompt:
+- `/do import details from this page`
+- `/do remember my details`
+
+#### How to Clear or Reset the Vault
+- In the **Vault** tab, click **"Clear Vault"** at the bottom. This immediately purges all keys from `chrome.storage.local`.
+
+---
+
+## ⚡ Instant On-Device Commands & Sample Prompts
+
+The agent uses a **Hybrid Execution Engine**:
+- **Deterministic actions** (`type`, `fill`, `click`, `select`, `scroll`) are parsed and executed **100% on-device** via `LocalCommandParser`.
+- **Zero API Quota Usage**: Does not consume your Gemini rate limits (`429 RESOURCE_EXHAUSTED` immune).
+- **0ms Network Delay**: Executes instantaneously.
+- **Absolute Privacy**: Sensitive values like OTPs, passwords, and IDs are typed straight into the DOM without touching external network requests.
+
+### Sample Command Reference
+
+Prefix action prompts with `/do` in the Side Panel Chat:
+
+| Category | Prompt Examples | What It Does |
+| :--- | :--- | :--- |
+| **Form Autofill (from Vault)** | `/do fill the form`<br>`/do autofill form`<br>`/do fill details from my vault` | Matches form fields on the active tab against your local Vault and populates all matching fields (Name, Aadhaar, Email, etc.) automatically. |
+| **Field Typing (Values)** | `/do type 123456 in the OTP field`<br>`/do fill the OTP field with 654321`<br>`/do enter Aryan into name`<br>`/do fill user@example.com in email` | Finds the target input field using fuzzy label & semantic matching and types the specified value. |
+| **Combined Actions** | `/do type Aryan in name and click submit`<br>`/do fill 123456 in otp and click confirm` | Executes sequential actions (typing followed by button clicks) in a single command. |
+| **Clicks & Submissions** | `/do click Submit`<br>`/do click Search Flights`<br>`/do submit the form`<br>`/do tap Confirm` | Identifies matching buttons or links by text/ID/ARIA label and triggers a trusted click event. |
+| **Dropdown Selects** | `/do select India in country`<br>`/do select Economy in class` | Finds the appropriate `<select>` element and chooses the requested option. |
+| **Scrolling & Navigation** | `/do scroll down`<br>`/do scroll up`<br>`/do scroll to bottom` | Smoothly scrolls the active viewport on-device. |
+| **Vault Extraction** | `/do import details from this page`<br>`/do remember my details from page` | Scans page text, extracts recognized profile entities, and saves them to your local Vault. |
 
 ---
 
