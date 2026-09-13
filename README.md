@@ -214,7 +214,7 @@ We have created local sandboxes for you to safely test the Action Engine and the
 ### 2. Testing the Action Engine
 1. Open [docs/test-playground.html](docs/test-playground.html) in Chrome.
 2. Open the Side Panel Chat.
-3. Type: `/do Type Kavya in the Name field and click Submit`
+3. Type: `/do Type [NAME] in the Name field and click Submit`
 4. **Expected Result:** 
    - The agent perceives the DOM.
    - The LLM creates a structured `type` and `click` action plan.
