@@ -135,6 +135,15 @@ The backend requires an LLM API key (Google Gemini) to generate action plans.
 
 ---
 
+### Step 4: Start the Local Test Hub Server
+To view the unified Testing Hub and Playgrounds, run a local Python HTTP server in the root directory:
+```bash
+python -m http.server 8080
+```
+*The Test Hub will be available at `http://localhost:8080/testing/index.html`.*
+
+---
+
 ## 🔐 On-Device Privacy Vault (Local Profile Memory)
 
 The **Privacy Vault** allows the agent to remember your personal credentials (e.g., name, Aadhaar, PAN, card details, phone, email) so you don't have to re-type them into forms repeatedly.
@@ -203,22 +212,28 @@ Prefix action prompts with `/do` in the Side Panel Chat:
 
 ## 🧪 End-to-End Testing Guide
 
-We have created local sandboxes for you to safely test the Action Engine and the Privacy Firewall.
+We have created an entire local ecosystem of sandboxes for you to safely test the Action Engine, Vault, and Privacy Firewall. 
 
-### 1. Testing the Privacy Firewall
-1. Open [docs/privacy-test.html](docs/privacy-test.html) in Chrome. This page is filled with mock Aadhaar, PAN, Credit Cards, and passwords.
-2. Open the Assistant Side Panel.
-3. Observe the **Privacy Firewall** tab. It will instantly show that it inspected elements and actively redacted sensitive data locally.
-4. To verify zero network leakage, open the **Network Tab** in your Chrome DevTools, ask the agent a question, and inspect the `POST /api/agent/plan` payload. You will see placeholders like `[EMAIL]` and `[AADHAAR]` instead of the raw data.
+To access all testing environments, navigate to the **[Central Test Hub](http://localhost:8080/testing/index.html)** in your browser after completing Step 4.
 
-### 2. Testing the Action Engine
-1. Open [docs/test-playground.html](docs/test-playground.html) in Chrome.
-2. Open the Side Panel Chat.
-3. Type: `/do Type [NAME] in the Name field and click Submit`
-4. **Expected Result:** 
-   - The agent perceives the DOM.
-   - The LLM creates a structured `type` and `click` action plan.
-   - The local executor physically types the text and clicks the button, triggering the success alert.
+### Available Playgrounds
+1. **[Advanced Checkout (`testing/test-advanced-checkout.html`)](http://localhost:8080/testing/test-advanced-checkout.html)**: Tests complex NLP mappings with tricky field labels (e.g., "Digital Contact Address").
+2. **[Gov KYC Portal (`testing/test-kyc-portal.html`)](http://localhost:8080/testing/test-kyc-portal.html)**: Extremely sensitive data test (Aadhaar, PAN, OTPs) to ensure zero-cloud leakage.
+3. **[Data Extractor (`testing/test-data-extraction.html`)](http://localhost:8080/testing/test-data-extraction.html)**: A mock invoice to test the agent's ability to extract and save profile data directly to your Vault.
+4. **[Privacy Sandbox (`testing/privacy-test.html`)](http://localhost:8080/testing/privacy-test.html)**: The classic Privacy Firewall sandbox for testing redaction across every PII category.
+5. **[Flight Search (`testing/test-playground.html`)](http://localhost:8080/testing/test-playground.html)**: Basic action execution playground (Typing, Dropdowns, Checkboxes).
+
+### Testing the Privacy Firewall
+1. Open the **Privacy Sandbox** or **Gov KYC Portal** in Chrome.
+2. Open the Assistant Side Panel and navigate to the **Privacy Firewall** tab.
+3. As the agent perceives the DOM, it will instantly show active redactions for sensitive data like Aadhaar and PAN cards.
+4. **Zero Network Leakage**: Open Chrome DevTools (Network tab), ask the agent a question, and inspect the `POST /api/agent/plan` payload. You will only see `[AADHAAR]`, `[PAN]`, and `[EMAIL]` placeholders sent to the server.
+
+### Testing the Action Engine
+1. Open the **Flight Search** or **Advanced Checkout** playground.
+2. Ensure your Vault is populated with test data (use the cheatsheet from the Demo page).
+3. Type: `/do autofill the form` or `/do type [NAME] in the Name field and click Search`.
+4. **Expected Result**: The local executor will parse the LLM action plan, instantly match the fields using fuzzy semantic matching, and execute physical DOM actions (typing, clicking) without touching any external APIs.
 
 ---
 
