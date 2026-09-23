@@ -125,6 +125,21 @@ chrome.runtime.onMessageExternal.addListener(
         return true; // async response
       }
     }
+
+    if (message.type === "SET_THEME_PREFS") {
+      const { isDark, color } = message.payload || {};
+      const updates: any = {};
+      
+      if (isDark !== undefined) updates.themeDark = isDark;
+      if (color !== undefined) updates.themeColor = color;
+
+      if (Object.keys(updates).length > 0) {
+        chrome.storage.local.set(updates, () => {
+          sendResponse({ success: true, updates });
+        });
+        return true; // async response
+      }
+    }
     
     sendResponse({ error: "Unknown external message" });
     return false;

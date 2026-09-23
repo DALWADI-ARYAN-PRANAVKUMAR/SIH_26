@@ -19,6 +19,9 @@ export interface UserProfile {
   from: string;
   to: string;
   country: string;
+  bankAccount: string;
+  bankIfsc: string;
+  bankName: string;
 }
 
 export const EMPTY_PROFILE: UserProfile = {
@@ -34,6 +37,9 @@ export const EMPTY_PROFILE: UserProfile = {
   from: "",
   to: "",
   country: "",
+  bankAccount: "",
+  bankIfsc: "",
+  bankName: "",
 };
 
 // Kept for backward-compatibility or quick testing if desired

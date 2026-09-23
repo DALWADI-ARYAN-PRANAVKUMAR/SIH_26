@@ -17,30 +17,30 @@ export const SystemMetrics: React.FC = () => {
 
   return (
     <div className="flex-1 p-4 overflow-y-auto">
-      <div className="bg-white/20 dark:bg-black/20 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
-        <h3 className="text-xs font-semibold text-agent-text mb-3 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-agent-primary animate-pulse"></span>
+      <div className="bg-white dark:bg-zinc-950/20 dark:bg-black/20 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+        <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mb-3 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-zinc-900 text-white animate-pulse"></span>
           System Telemetry
         </h3>
         
         <div className="grid grid-cols-2 gap-3">
           <div className="flex flex-col">
-            <span className="text-[10px] text-agent-text-muted">RAM Usage</span>
-            <span className="text-sm font-medium text-agent-text">{ram > 0 ? `${ram} MB` : 'N/A'}</span>
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">RAM Usage</span>
+            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{ram > 0 ? `${ram} MB` : 'N/A'}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] text-agent-text-muted">WebGPU Status</span>
-            <span className={`text-sm font-medium ${metrics.gpuActive ? 'text-agent-success' : 'text-agent-text'}`}>
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">WebGPU Status</span>
+            <span className={`text-sm font-medium ${metrics.gpuActive ? 'text-agent-success' : 'text-zinc-900 dark:text-zinc-100'}`}>
               {metrics.gpuActive ? 'Active' : 'Idle'}
             </span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] text-agent-text-muted">Vision Latency</span>
-            <span className="text-sm font-medium text-agent-text">{metrics.visionLatencyMs} ms</span>
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Vision Latency</span>
+            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{metrics.visionLatencyMs} ms</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] text-agent-text-muted">Privacy Firewall</span>
-            <span className="text-sm font-medium text-agent-text">{metrics.privacyLatencyMs} ms</span>
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 dark:text-zinc-500">Privacy Firewall</span>
+            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{metrics.privacyLatencyMs} ms</span>
           </div>
         </div>
       </div>

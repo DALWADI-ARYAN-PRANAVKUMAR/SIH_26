@@ -107,10 +107,39 @@ export async function startAgentTask(taskPrompt: string) {
       let isLocalAction = false;
 
       if (isAutofill) {
-        logStep("🔒 Accessing on-device Profile Vault...");
+        logStep("🔒 Accessing on-device Profile Vault for NLP Mapping...");
         const vault = await loadProfileVault();
-        plan = generateVaultAutofillPlan(pageContext, vault);
-        logStep(`On-device Planner: ${plan.message}`);
+        const vaultKeys = Object.keys(vault).filter(k => (vault as any)[k] && (vault as any)[k].trim() !== "");
+        
+        if (vaultKeys.length === 0) {
+           store.setTaskState("COMPLETED");
+           logStep("Your Privacy Vault is currently empty. Please fill it first.");
+           return;
+        }
+
+        // We append the available keys to the prompt so the LLM can map them using NLP without seeing the data.
+        const nlpPrompt = `AUTOFILL COMMAND. Map the following available Vault Keys to the appropriate form fields on this page using Natural Language Processing.
+Available Vault Keys: ${vaultKeys.join(", ")}
+Output action 'type' or 'select' with value set exactly to the bracketed key name (e.g. '[email]', '[bankAccount]'). The client will securely substitute the real data.`;
+
+        logStep("Requesting NLP field mapping from backend...");
+        plan = await fetchActionPlan(nlpPrompt, sanitizedContext);
+        
+        // Secure On-Device Substitution (Privacy Firewall)
+        let mappedCount = 0;
+        for (const action of plan.actions) {
+           if (action.value && typeof action.value === 'string' && action.value.startsWith('[') && action.value.endsWith(']')) {
+              const key = action.value.slice(1, -1);
+              if ((vault as any)[key]) {
+                 action.value = (vault as any)[key];
+                 mappedCount++;
+              }
+           }
+        }
+        
+        plan.message = `Autofilling ${mappedCount} fields using NLP mapping (Zero cloud data exposure).`;
+        logStep(`On-device NLP Planner: ${plan.message}`);
+        
       } else {
         const { parseLocalCommand } = await import("./LocalCommandParser");
         const localPlan = parseLocalCommand(taskPrompt, pageContext);

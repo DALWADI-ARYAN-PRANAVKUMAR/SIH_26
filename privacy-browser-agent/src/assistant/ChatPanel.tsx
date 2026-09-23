@@ -41,7 +41,7 @@ export const ChatPanel: React.FC = () => {
         // Simple slide-in animation
         animation: "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
       }}
-      className="flex flex-col bg-agent-bg shadow-neu overflow-hidden"
+      className="flex flex-col bg-zinc-50 dark:bg-zinc-900/50 shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden"
     >
       <style>{`
         @keyframes slideInRight {
@@ -53,11 +53,11 @@ export const ChatPanel: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-agent-text">
+          <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
             ✦ Privacy Agent
           </span>
           {state !== "IDLE" && (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-agent-primary/20 text-agent-primary font-medium">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-900 dark:text-zinc-100 font-semibold font-medium">
               {state}
             </span>
           )}
@@ -66,7 +66,7 @@ export const ChatPanel: React.FC = () => {
           {/* Minimize */}
           <button
             onClick={() => setPanel(false)}
-            className="text-agent-text-muted hover:text-agent-text w-7 h-7 flex items-center justify-center rounded-md hover:bg-agent-surface-light transition-colors text-base"
+            className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:text-zinc-100 w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:bg-zinc-950 transition-colors text-base"
             title="Minimize"
           >
             −
@@ -74,7 +74,7 @@ export const ChatPanel: React.FC = () => {
           {/* Close */}
           <button
             onClick={() => setPanel(false)}
-            className="text-agent-text-muted hover:text-agent-error w-7 h-7 flex items-center justify-center rounded-md hover:bg-agent-surface-light transition-colors text-sm"
+            className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:text-red-500 w-7 h-7 flex items-center justify-center rounded-md hover:bg-white dark:bg-zinc-950 transition-colors text-sm"
             title="Close"
           >
             ✕
@@ -90,8 +90,8 @@ export const ChatPanel: React.FC = () => {
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 py-2 text-xs font-medium transition-colors ${
               activeTab === tab.key
-                ? "text-agent-primary border-b-2 border-agent-primary bg-agent-primary/5"
-                : "text-agent-text-muted hover:text-agent-text hover:bg-agent-surface/50"
+                ? "text-zinc-900 dark:text-zinc-100 font-semibold border-b-2 border-zinc-900 bg-zinc-900 text-white/5"
+                : "text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:text-zinc-100 hover:bg-white dark:bg-zinc-950/50"
             }`}
           >
             {tab.label}

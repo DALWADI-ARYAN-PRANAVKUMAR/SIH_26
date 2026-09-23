@@ -42,12 +42,12 @@ export const InputBox: React.FC = () => {
         onKeyDown={handleKeyDown}
         placeholder={isProcessing ? "Processing..." : "Type '/do' for actions, or chat..."}
         disabled={isProcessing}
-        className="flex-1 bg-agent-bg shadow-neu-inset rounded-lg px-3 py-2 text-sm text-agent-text placeholder-agent-text-muted outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex-1 bg-zinc-100 dark:bg-zinc-800 shadow-inner rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 placeholder-agent-text-muted outline-none disabled:opacity-50 disabled:cursor-not-allowed"
       />
       <button
         onClick={handleSend}
         disabled={!text.trim() || isProcessing}
-        className="bg-agent-primary disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 shadow-neu active:shadow-neu-inset"
+        className="bg-zinc-900 text-white disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 shadow-sm border border-zinc-200 dark:border-zinc-800 active:shadow-inner active:bg-zinc-100 dark:bg-zinc-800"
       >
         Send
       </button>

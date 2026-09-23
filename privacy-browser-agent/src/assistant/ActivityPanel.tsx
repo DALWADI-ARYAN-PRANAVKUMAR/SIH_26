@@ -24,9 +24,9 @@ function getStatusColor(status: ActivityStatus): string {
     case "done":
       return "text-agent-success";
     case "pending":
-      return "text-agent-warning";
+      return "text-amber-600";
     case "error":
-      return "text-agent-error";
+      return "text-red-500";
   }
 }
 
@@ -46,13 +46,13 @@ export const ActivityPanel: React.FC = () => {
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header with clear button */}
       <div className="flex items-center justify-between px-4 py-3">
-        <span className="text-agent-text-muted text-xs font-medium">
+        <span className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 text-xs font-medium">
           Pipeline Activity
         </span>
         {activities.length > 0 && (
           <button
             onClick={clearActivities}
-            className="text-agent-text-muted text-[10px] hover:text-agent-text transition-colors"
+            className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 text-[10px] hover:text-zinc-900 dark:text-zinc-100 transition-colors"
           >
             Clear
           </button>
@@ -66,7 +66,7 @@ export const ActivityPanel: React.FC = () => {
         style={{ minHeight: 0 }}
       >
         {activities.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-agent-text-muted text-xs">
+          <div className="flex items-center justify-center h-full text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 text-xs">
             No activity yet
           </div>
         ) : (
@@ -81,10 +81,10 @@ export const ActivityPanel: React.FC = () => {
                 >
                   {getStatusIcon(event.status)}
                 </span>
-                <span className="text-agent-text leading-relaxed">
+                <span className="text-zinc-900 dark:text-zinc-100 leading-relaxed">
                   {event.label}
                 </span>
-                <span className="text-agent-text-muted text-[10px] ml-auto flex-shrink-0">
+                <span className="text-zinc-500 dark:text-zinc-400 dark:text-zinc-500 text-[10px] ml-auto flex-shrink-0">
                   {new Date(event.timestamp).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
