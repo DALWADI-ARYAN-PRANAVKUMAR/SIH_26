@@ -1,7 +1,4 @@
 <div align="center">
-  <!-- TODO: Replace the src below with a link to your banner image -->
-  <img src="https://via.placeholder.com/800x200?text=Privacy-Preserving+AI+Browser+Agent" alt="Project Banner" width="100%" />
-
   <h1>🛡️ Privacy-Preserving AI Browser Agent</h1>
   <p><strong>SIH26171 – On-device Visual Perception for Lightweight Browser Agents</strong></p>
   
@@ -15,10 +12,6 @@
   </p>
 
   <p>An intelligent, privacy-first browser agent that lives directly inside your web pages. It provides a draggable floating assistant, a native Chrome side panel, and deep page-aware AI understanding without compromising user security.</p>
-
-  <!-- TODO: Replace the src below with a link to your demo GIF -->
-  <br />
-  <img src="https://via.placeholder.com/600x350?text=Insert+Demo+GIF+Here" alt="Demo GIF" width="80%" />
 </div>
 
 <hr />
